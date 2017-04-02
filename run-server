@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+
+dn=${0:a:h}
+
+name=/Users/Daven/Development/Naukluft/versioned/nAPPe
+
+${name}/node_modules/.bin/tessera --port 3005 -c ${dn}/tile-config.json

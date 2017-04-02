@@ -1,0 +1,10 @@
+{
+  "name": "Server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "mbtiles": "^0.9.0",
+    "tessera": "^0.10.0"
+  }
+}
