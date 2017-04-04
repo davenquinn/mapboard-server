@@ -5,4 +5,8 @@ dn=${0:a:h}
 # This is a hack that leaves us exposed to changes elsewhere
 name=/Users/Daven/Development/Naukluft/versioned/nAPPe
 
-${name}/node_modules/.bin/tessera --port 3005 --config ${dn}/tile-config.json
+${name}/node_modules/.bin/tessera --port 3005 --config ${dn}/tile-config.json & PIDTILES=$!
+node index.js & PIDSERVER=$!
+
+wait $PIDTILES
+wait $PIDSERVER

@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "coffee-script": "^1.12.4",
     "mbtiles": "^0.9.0",
     "tessera": "^0.10.0"
   }
