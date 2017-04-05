@@ -5,7 +5,7 @@ app = express()
 
 app.use bodyParser.json()
 
-app.get "/features-in-area", (req, res)->
+app.post "/features-in-area", (req, res)->
   console.log req.body
   res.send({foo: 'baz'})
 
