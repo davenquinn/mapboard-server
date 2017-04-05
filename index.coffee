@@ -1,12 +1,18 @@
-http = require 'http'
+express = require 'express'
+bodyParser = require 'body-parser'
 
+app = express()
 
-console.log "Listening for API requests"
+app.use bodyParser.json()
 
-requestListener = (req, res)->
-  res.writeHead 200
-  res.end 'Hello, World!\n'
-  console.log "Request made with content", req.content
+app.get "/features-in-area", (req, res)->
+  console.log req.body
+  res.send({foo: 'baz'})
 
-server = http.createServer(requestListener)
-server.listen(3006)
+# Set up routes
+app.post "/drew-line",(req, res)->
+  console.log req.body
+  res.send({foo: 'bar'})
+
+server = app.listen 3006, ->
+  console.log "Listening on port #{server.address().port}"
