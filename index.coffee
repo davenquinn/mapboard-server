@@ -1,9 +1,10 @@
 express = require 'express'
 bodyParser = require 'body-parser'
-pgp = require('pg-promise')()
+Promise = require 'bluebird'
+pgp = require('pg-promise')(promiseLib: Promise)
 path = require 'path'
 
-db = pgp database: "syrtis"
+db = pgp "postgres:///Naukluft"
 
 app = express()
 
@@ -17,11 +18,13 @@ getFeatures = sql("sql/get-features-in-area.sql")
 
 app.post "/features-in-area", (req, res)->
   env = req.body.envelope
-  console.log env
   db.query getFeatures, env
-
-
-  res.send({foo: 'baz'})
+    .map (r)-> {
+      type: 'Feature'
+      geometry: JSON.parse(r.geom)
+      properties: {type: r.type}
+      id: r.id }
+    .then (data)->res.send(data)
 
 # Set up routes
 app.post "/drew-line",(req, res)->
