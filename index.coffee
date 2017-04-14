@@ -25,11 +25,11 @@ app.post "/features-in-area", (req, res)->
     .map (r)-> {
       type: 'Feature'
       geometry: JSON.parse(r.geom)
-      properties: {
-        type: r.type,
+      properties:
+        type: r.type
         color: r.color
-      }
       id: r.id }
+    .tap (d)->(d.map (m)-> console.log(m.properties))
     .then (data)->res.send(data)
 
 # Set up routes
