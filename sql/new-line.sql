@@ -1,5 +1,5 @@
-INSERT INTO editable_linework (id, geometry, type) VALUES (
-  nextval('editable_linework_id_seq'),
+INSERT INTO linework (id, geometry, type) VALUES (
+  DEFAULT,
   ST_Multi(ST_SetSRID(ST_GeomFromEWKB(${geometry}), 4326)),
   ${lineType})
 RETURNING
