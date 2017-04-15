@@ -3,5 +3,5 @@ SELECT
   name,
   color
 FROM
-  linework_type
+  mapping.linework_type
 

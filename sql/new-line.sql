@@ -1,7 +1,33 @@
-INSERT INTO linework (geometry, type) VALUES (
-  ST_Multi(ST_SetSRID(ST_GeomFromEWKB(${geometry}), 4326)),
-  ${lineType})
-RETURNING
-  id,
-  ST_AsGeoJSON((ST_Dump(geometry)).geom) geom,
-  type;
+WITH newline AS (
+INSERT INTO mapping.linework
+  (geometry, type, pixel_width, map_width, zoom_level)
+VALUES (
+  ST_Multi(
+    Linework_SnapEndpoints(
+      ST_Transform(
+        ST_SetSRID(ST_GeomFromEWKB(${geometry}), 4326),
+        (SELECT ST_SRID(geometry) FROM mapping.linework LIMIT 1)
+      ),
+      ${map_width}
+    )
+  ),
+  ${lineType},
+  ${pixel_width},
+  ${map_width},
+  ${zoom_level}
+  )
+RETURNING *
+)
+SELECT
+  l.id,
+  ST_AsGeoJSON(
+    (ST_Dump(
+      ST_Transform(geometry, 4326)
+      )).geom
+  ) geometry,
+  type,
+  map_width,
+  coalesce(color, '#888888') color
+FROM newline l
+JOIN mapping.linework_type t
+  ON l.type = t.id
