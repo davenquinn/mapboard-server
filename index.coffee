@@ -37,11 +37,14 @@ parseGeometry = (f)->
   # Parses a geojson feature to geometry
   wkx.Geometry.parseGeoJSON(f.geometry).toEwkb()
 
+send = (res)->
+  (data)->res.send(data)
+
 app.post "/features-in-area", (req, res)->
   env = req.body.envelope
   db.query sql['get-features-in-area'], env
     .map serializeFeature
-    .then (data)->res.send(data)
+    .then send(res)
 
 # Set up routes
 app.post "/new-line",(req, res)->
@@ -55,11 +58,11 @@ app.post "/new-line",(req, res)->
 
   db.one sql['new-line'], data
     .map serializeFeature
-    .then (data)->res.send(data)
+    .then send(res)
 
 app.post "/delete", (req, res)->
   db.query sql['delete-line'], id: req.body.id
-    .then (data)->res.send(data)
+    .then send(res)
 
 app.post "/erase", (req, res)->
   # Erase features given a geojson polygon
@@ -68,14 +71,15 @@ app.post "/erase", (req, res)->
   data =
     geometry: parseGeometry(f)
     type: f.properties.type
-
+  console.log data
   db.query sql['erase-lines'], data
     .map serializeFeature
-    .then (data)->res.send(data)
+    .tap (d)->console.log d
+    .then send(res)
 
 app.get "/types", (req, res)->
   db.query sql['get-feature-types']
-    .then (data)->res.send(data)
+    .then send(res)
 
 server = app.listen 3006, ->
   console.log "Listening on port #{server.address().port}"

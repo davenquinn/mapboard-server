@@ -23,7 +23,7 @@ LOOP
   SELECT
     ST_ClosestPoint(ST_Intersection(l.geometry, buffer), point)
   INTO closestPoint
-  FROM linework l
+  FROM mapping.linework l
   WHERE ST_Intersects(l.geometry, buffer);
 
   -- We have a geometry to append to

@@ -1,13 +1,13 @@
 WITH eraser AS (
 SELECT ST_Transform(
   ST_SetSRID(ST_GeomFromEWKB(${geometry}), 4326),
-  (SELECT ST_SRID(geometry) FROM mapping.linework LIMIT 1)) geometry
+  (SELECT ST_SRID(geometry) FROM mapping.linework LIMIT 1)) AS geom
 ),
 updated AS (
 UPDATE mapping.linework l
-SET geometry = ST_Difference(l.geometry, eraser.geometry)
+SET geometry = ST_Multi((ST_Dump(ST_Difference(l.geometry, eraser.geom))).geom)
 FROM eraser
-WHERE ST_Intersects(l.geometry, eraser.geometry)
+WHERE ST_Intersects(l.geometry, eraser.geom)
   AND l.type = ${type}
 RETURNING *
 )
@@ -15,7 +15,7 @@ SELECT
   l.id,
   ST_AsGeoJSON(
     (ST_Dump(
-      ST_Transform(geometry, 4326)
+      ST_Transform(l.geometry, 4326)
       )).geom
   ) geometry,
   type,

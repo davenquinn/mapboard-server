@@ -11,7 +11,7 @@ VALUES (
       ${map_width}
     )
   ),
-  ${lineType},
+  ${type},
   ${pixel_width},
   ${map_width},
   ${zoom_level}
@@ -22,9 +22,9 @@ SELECT
   l.id,
   ST_AsGeoJSON(
     (ST_Dump(
-      ST_Transform(geometry, 4326)
+      ST_Transform(l.geometry, 4326)
       )).geom
-  ) geometry,
+  ) AS geometry,
   type,
   map_width,
   coalesce(color, '#888888') color
