@@ -1,5 +1,4 @@
-INSERT INTO linework (id, geometry, type) VALUES (
-  DEFAULT,
+INSERT INTO linework (geometry, type) VALUES (
   ST_Multi(ST_SetSRID(ST_GeomFromEWKB(${geometry}), 4326)),
   ${lineType})
 RETURNING
