@@ -1,6 +1,6 @@
 WITH eraser AS (
 SELECT ST_Transform(
-  ST_SetSRID(ST_GeomFromEWKB(${geometry}), 4326),
+  ST_SetSRID(ST_GeomFromGeoJSON(${geometry}), 4326),
   (SELECT ST_SRID(geometry) FROM mapping.linework LIMIT 1)) AS geom
 ),
 updated AS (
@@ -19,7 +19,8 @@ SELECT
       )).geom
   ) geometry,
   type,
-  map_width,
+  coalesce(pixel_width,2) pixel_width,
+  coalesce(map_width,1) map_width,
   coalesce(color, '#888888') color
 FROM updated l
 JOIN mapping.linework_type t

@@ -5,7 +5,7 @@ VALUES (
   ST_Multi(
     Linework_SnapEndpoints(
       ST_Transform(
-        ST_SetSRID(ST_GeomFromEWKB(${geometry}), 4326),
+        ST_SetSRID(ST_GeomFromGeoJSON(${geometry}), 4326),
         (SELECT ST_SRID(geometry) FROM mapping.linework LIMIT 1)
       ),
       ${map_width}
@@ -26,6 +26,7 @@ SELECT
       )).geom
   ) AS geometry,
   type,
+  pixel_width,
   map_width,
   coalesce(color, '#888888') color
 FROM newline l

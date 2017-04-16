@@ -30,6 +30,8 @@ serializeFeature = (r)->
     properties:
       type: r.type
       color: r.color
+      pixel_width: r.pixel_width
+      map_width: r.map_width
     id: r.id
   }
 
@@ -50,14 +52,15 @@ app.post "/features-in-area", (req, res)->
 app.post "/new-line",(req, res)->
   f = req.body
   data =
-    geometry: parseGeometry(f)
+    geometry: f.geometry
     type: f.properties.type
     pixel_width: f.properties.pixel_width
     map_width: f.properties.map_width
     zoom_level: f.properties.zoom_level
 
   db.one sql['new-line'], data
-    .map serializeFeature
+    .tap console.log
+    .then serializeFeature
     .then send(res)
 
 app.post "/delete", (req, res)->
@@ -69,12 +72,11 @@ app.post "/erase", (req, res)->
   # Returns a list of replaced features
   f = req.body
   data =
-    geometry: parseGeometry(f)
+    geometry: f.geometry
     type: f.properties.type
-  console.log data
   db.query sql['erase-lines'], data
+    .tap console.log
     .map serializeFeature
-    .tap (d)->console.log d
     .then send(res)
 
 app.get "/types", (req, res)->

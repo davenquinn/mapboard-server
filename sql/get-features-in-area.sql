@@ -6,7 +6,8 @@ SELECT
       )).geom
   ) geometry,
   type,
-  map_width,
+  coalesce(pixel_width,2) pixel_width,
+  coalesce(map_width,1) map_width,
   coalesce(color, '#888888') color
 FROM
   mapping.linework l
