@@ -24,15 +24,18 @@ db.query sql['snap-function']
   .then -> console.log "SQL functions are set up!!!"
 
 serializeFeature = (r)->
+  geom = JSON.parse(r.geometry)
+  console.log geom.type
   {
     type: 'Feature'
-    geometry: JSON.parse(r.geometry)
+    geometry: geom
     properties:
       type: r.type
       color: r.color
       pixel_width: r.pixel_width
       map_width: r.map_width
     id: r.id
+    part: r.part
   }
 
 parseGeometry = (f)->

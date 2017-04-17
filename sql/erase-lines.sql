@@ -10,14 +10,11 @@ FROM eraser
 WHERE ST_Intersects(l.geometry, eraser.geom)
   AND l.type = ${type}
 RETURNING *
-)
+),
+rows AS (
 SELECT
   l.id,
-  ST_AsGeoJSON(
-    (ST_Dump(
-      ST_Transform(l.geometry, 4326)
-      )).geom
-  ) geometry,
+  ST_Dump(ST_Transform(l.geometry, 4326)) geometries,
   type,
   coalesce(pixel_width,2) pixel_width,
   coalesce(map_width,1) map_width,
@@ -25,3 +22,13 @@ SELECT
 FROM updated l
 JOIN mapping.linework_type t
   ON l.type = t.id
+)
+SELECT
+  id,
+  ST_AsGeoJSON((geometries).geom) geometry,
+  (geometries). part,
+  type,
+  pixel_width,
+  map_width,
+  color
+FROM rows;
