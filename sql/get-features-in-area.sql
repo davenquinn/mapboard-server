@@ -1,7 +1,6 @@
-WITH rows AS (
 SELECT
   l.id,
-  ST_Dump(ST_Transform(geometry, 4326)) geometries,
+  ST_Transform(geometry, 4326) geometry,
   type,
   coalesce(pixel_width,2) pixel_width,
   coalesce(map_width,1) map_width,
@@ -13,13 +12,4 @@ JOIN mapping.linework_type t
 WHERE geometry && ST_Transform(
   ST_MakeEnvelope($1, $2, $3, $4, 4326),
   (SELECT ST_SRID(geometry) FROM mapping.linework LIMIT 1))
-)
-SELECT
-  id,
-  ST_AsGeoJSON((geometries).geom) geometry,
-  (geometries).path part,
-  type,
-  pixel_width,
-  map_width,
-  color
-FROM rows;
+
