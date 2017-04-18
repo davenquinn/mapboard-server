@@ -25,10 +25,10 @@ db.query sql['snap-function']
   .then -> console.log "SQL functions are set up!!!"
 
 serializeFeature = (r)->
+
   _ = new Buffer(r.geometry,'hex')
   geom = wkx.Geometry.parse(_).toGeoJSON()
-  console.log geom.type
-  return {
+  feature = {
     type: 'Feature'
     geometry: geom
     properties:
@@ -38,6 +38,17 @@ serializeFeature = (r)->
       map_width: r.map_width
     id: r.id
   }
+
+  # Handle erasing transparently-ish
+  r.erased ?= false
+  if r.erased
+    feature =
+      type: 'DeletedFeature'
+      id: r.id
+
+  console.log feature.type
+  return feature
+
 
 parseGeometry = (f)->
   # Parses a geojson feature to geometry
