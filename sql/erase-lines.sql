@@ -5,7 +5,7 @@ SELECT ST_Transform(
 ),
 updated AS (
 UPDATE mapping.linework l
-SET geometry = ST_Multi(ST_Difference(l.geometry, eraser.geom))
+SET geometry = ST_Multi((ST_Dump(ST_Difference(l.geometry, eraser.geom))).geom)
 FROM eraser
 WHERE ST_Intersects(l.geometry, eraser.geom)
   AND l.type = ${type}

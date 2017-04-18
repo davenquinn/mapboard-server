@@ -19,7 +19,7 @@ sql = {}
 for fn in readdirSync(dn)
   key = path.basename(fn,'.sql')
   _ = path.join(dn,fn)
-  sql[key] = pgp.QueryFile _, minify: true
+  sql[key] = pgp.QueryFile _, minify: true, debug: true
 
 db.query sql['snap-function']
   .then -> console.log "SQL functions are set up!!!"
@@ -27,6 +27,7 @@ db.query sql['snap-function']
 serializeFeature = (r)->
   _ = new Buffer(r.geometry,'hex')
   geom = wkx.Geometry.parse(_).toGeoJSON()
+  console.log geom.type
   return {
     type: 'Feature'
     geometry: geom
