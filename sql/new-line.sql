@@ -8,7 +8,7 @@ VALUES (
         ST_SetSRID(ST_GeomFromGeoJSON(${geometry}), 4326),
         (SELECT ST_SRID(geometry) FROM mapping.linework LIMIT 1)
       ),
-      ${map_width}
+      ${map_width}*2
     )
   ),
   ${type},
