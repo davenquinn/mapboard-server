@@ -12,4 +12,5 @@ JOIN mapping.linework_type t
 WHERE geometry && ST_Transform(
   ST_MakeEnvelope($1, $2, $3, $4, 4326),
   (SELECT ST_SRID(geometry) FROM mapping.linework LIMIT 1))
+  AND NOT l.arbitrary
 

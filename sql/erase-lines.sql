@@ -10,6 +10,7 @@ SELECT
 FROM mapping.linework l
 JOIN eraser e ON ST_Intersects(l.geometry, e.geom)
 WHERE l.type = ${type}
+  AND NOT l.arbitrary
 ),
 updated AS (
 UPDATE mapping.linework l
