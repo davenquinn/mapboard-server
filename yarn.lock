@@ -238,6 +238,10 @@ coffee-script@^1.12.4:
   version "1.12.4"
   resolved "https://registry.yarnpkg.com/coffee-script/-/coffee-script-1.12.4.tgz#fe1bced97fe1fb3927b998f2b45616e0658be1ff"
 
+coffeescript@next:
+  version "2.0.0-beta4"
+  resolved "https://registry.yarnpkg.com/coffeescript/-/coffeescript-2.0.0-beta4.tgz#1beb4650d10eb7c9e528f5bfa3b6c7085691e24c"
+
 combined-stream@^1.0.5, combined-stream@~1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.5.tgz#938370a57b4a51dea2c77c15d5c5fdf895164009"
@@ -667,21 +671,9 @@ manakin@0.4:
   version "0.4.6"
   resolved "https://registry.yarnpkg.com/manakin/-/manakin-0.4.6.tgz#759e265370c5cfeca5e02022981be7e6a56cd735"
 
-mapnik-vector-tile@1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/mapnik-vector-tile/-/mapnik-vector-tile-1.3.0.tgz#5364faf3445fcc8363dc9490e5cb3b272d21eb45"
-
 mapnik-vector-tile@~1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/mapnik-vector-tile/-/mapnik-vector-tile-1.2.2.tgz#42795ca211dd274a9a4af5bf6cfe3b0bfe0ba243"
-
-"mapnik@file:/Users/Daven/Development/Naukluft/versioned/deps/node/node-mapnik":
-  version "3.6.0"
-  dependencies:
-    mapnik-vector-tile "1.3.0"
-    nan "~2.5.0"
-    node-pre-gyp "~0.6.30"
-    protozero "1.5.1"
 
 mapnik@~3.5.0:
   version "3.5.14"
@@ -691,15 +683,6 @@ mapnik@~3.5.0:
     nan "~2.4.0"
     node-pre-gyp "~0.6.30"
     protozero "~1.4.2"
-
-mbtiles@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/mbtiles/-/mbtiles-0.9.0.tgz#52fa0352b8a0e197ed0a563a4ce1922df973d7d6"
-  dependencies:
-    d3-queue "~2.0.3"
-    sphericalmercator "~1.0.1"
-    sqlite3 "3.x"
-    tiletype "0.1.x"
 
 media-typer@0.3.0:
   version "0.3.0"
@@ -768,10 +751,6 @@ ms@0.7.2:
 nan@~2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.4.0.tgz#fb3c59d45fe4effe215f0b890f8adf6eb32d2232"
-
-nan@~2.5.0:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.5.1.tgz#d5b01691253326a97a2bbee9e61c55d8d60351e2"
 
 negotiator@0.6.1:
   version "0.6.1"
@@ -962,10 +941,6 @@ progress-stream@~0.5.x:
     single-line-log "~0.3.1"
     speedometer "~0.1.2"
     through2 "~0.2.3"
-
-protozero@1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/protozero/-/protozero-1.5.1.tgz#5a27df6fb6e1ed743f510812ae76c082f5b16638"
 
 protozero@~1.4.2:
   version "1.4.5"
@@ -1309,7 +1284,7 @@ tilelive@^5.3.3:
     queue-async "~1.0.7"
     sphericalmercator "~1.0.1"
 
-tiletype@0.1.x, tiletype@~0.1.0:
+tiletype@~0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/tiletype/-/tiletype-0.1.0.tgz#0b9ca654f8c0a7ccccd920edf594d3ee9489c297"
 
