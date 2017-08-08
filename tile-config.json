@@ -1,3 +1,5 @@
 {
-  "/": "mbtiles:///Users/Daven/Development/Naukluft/data/tilesets/Naukluft-satellite.mbtiles"
+  "/imagery": "mapnik:///Users/Daven/Development/Syrtis/versioned/map-styles/_compiled/ortho.xml?bufferSize=0&metatile=4",
+  "/contour": "mapnik:///Users/Daven/Development/Syrtis/versioned/map-styles/_compiled/contour.xml"
 }
+

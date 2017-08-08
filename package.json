@@ -7,11 +7,12 @@
     "@mapbox/mbtiles": "^0.9.0",
     "bluebird": "^3.5.0",
     "body-parser": "^1.17.1",
-    "coffee-script": "^1.12.4",
     "coffeescript": "next",
     "express": "^4.15.2",
+    "mapnik": "^3.6.2",
     "pg-promise": "^5.6.4",
     "tessera": "^0.10.1",
+    "tilelive-mapnik": "^0.6.18",
     "wkx": "^0.4.1"
   }
 }
