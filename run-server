@@ -2,8 +2,8 @@
 
 dn=${0:a:h}
 
-$(npm bin)/tessera --require tilelive-mapnik --port 3005 --config ${dn}/tile-config.json #& PIDTILES=$!
-#node index.js & PIDSERVER=$!
+$(npm bin)/tessera --require tilelive-mapnik --port 3005 --config ${dn}/tile-config.json & PIDTILES=$!
+coffee index.coffee & PIDSERVER=$!
 
-#wait $PIDTILES
-#wait $PIDSERVER
+wait $PIDTILES
+wait $PIDSERVER
