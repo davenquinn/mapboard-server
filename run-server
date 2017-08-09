@@ -2,6 +2,7 @@
 
 dn=${0:a:h}
 
+# Currently we serve tiles and features on two different ports but this is annoying for the long term
 $(npm bin)/tessera --require tilelive-mapnik --port 3005 --config ${dn}/tile-config.json & PIDTILES=$!
 coffee index.coffee & PIDSERVER=$!
 

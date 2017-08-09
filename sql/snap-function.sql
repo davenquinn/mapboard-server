@@ -23,8 +23,9 @@ LOOP
   SELECT
     ST_ClosestPoint(ST_Intersection(l.geometry, buffer), point)
   INTO closestPoint
-  FROM mapping.linework l
-  WHERE ST_Intersects(l.geometry, buffer);
+  FROM map_digitizer.linework l
+  WHERE ST_Intersects(l.geometry, buffer)
+    AND NOT l.hidden;
 
   -- We have a geometry to append to
   IF closestPoint IS NOT null THEN

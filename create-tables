@@ -1,0 +1,19 @@
+#!/usr/bin/env coffee
+_ = require 'pg-promise'
+
+query = (e)->console.log e.query
+pgp = _ {query}
+{QueryFile} = pgp
+{readFileSync} = require 'fs'
+
+db = pgp('postgresql:///syrtis')
+
+params = {srid: 950000}
+procedure = QueryFile "#{__dirname}/db-fixtures/create-tables.sql", {params}
+
+do ->
+  try
+    await db.query procedure
+  catch err
+    console.error err
+  process.exit()
