@@ -23,7 +23,7 @@ LOOP
   SELECT
     ST_ClosestPoint(ST_Intersection(l.geometry, buffer), point)
   INTO closestPoint
-  FROM map_digitizer.linework l
+  FROM ${schema~}.linework l
   WHERE ST_Intersects(l.geometry, buffer)
     AND NOT l.hidden;
 

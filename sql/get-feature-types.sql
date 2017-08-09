@@ -3,5 +3,5 @@ SELECT
   name,
   color
 FROM
-  map_digitizer.linework_type
+  ${schema~}.linework_type
 

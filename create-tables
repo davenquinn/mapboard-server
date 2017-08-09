@@ -1,14 +1,16 @@
 #!/usr/bin/env coffee
 _ = require 'pg-promise'
-
 query = (e)->console.log e.query
 pgp = _ {query}
+
+{dbname, srid, schema} = require './arg-parser'
+
 {QueryFile} = pgp
 {readFileSync} = require 'fs'
 
-db = pgp('postgresql:///syrtis')
+db = pgp("postgresql:///#{dbname}")
 
-params = {srid: 950000}
+params = {schema, srid}
 procedure = QueryFile "#{__dirname}/db-fixtures/create-tables.sql", {params}
 
 do ->

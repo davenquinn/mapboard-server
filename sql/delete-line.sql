@@ -1,2 +1,2 @@
-DELETE FROM map_digitizer.linework
+DELETE FROM ${schema~}.linework
 WHERE id = ${id} RETURNING id

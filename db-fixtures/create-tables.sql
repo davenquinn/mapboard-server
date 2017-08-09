@@ -1,13 +1,13 @@
-CREATE SCHEMA map_digitizer;
+CREATE SCHEMA ${schema~};
 
-CREATE TABLE map_digitizer.linework_type (
+CREATE TABLE ${schema~}.linework_type (
     id text PRIMARY KEY,
     name text,
     color text,
     bedrock boolean DEFAULT false
 );
 
-CREATE TABLE map_digitizer.linework (
+CREATE TABLE ${schema~}.linework (
   id            serial PRIMARY KEY,
   geometry      public.geometry(MultiLineString,${srid}) NOT NULL,
   type          text,
@@ -19,18 +19,18 @@ CREATE TABLE map_digitizer.linework (
   hidden        boolean DEFAULT false,
   source        text,
   name          text,
-  FOREIGN KEY (type) REFERENCES map_digitizer.linework_type(id) ON UPDATE CASCADE
+  FOREIGN KEY (type) REFERENCES ${schema~}.linework_type(id) ON UPDATE CASCADE
 );
-CREATE INDEX map_digitizer_linework_geometry_idx ON map_digitizer.linework USING gist (geometry);
+CREATE INDEX ${schema^}_linework_geometry_idx ON ${schema~}.linework USING gist (geometry);
 
-CREATE TABLE map_digitizer.polygon_type (
+CREATE TABLE ${schema~}.polygon_type (
     id text PRIMARY KEY,
     name text,
     color text,
     bedrock boolean DEFAULT false
 );
 
-CREATE TABLE map_digitizer.polygon (
+CREATE TABLE ${schema~}.polygon (
   id            serial PRIMARY KEY,
   geometry      public.geometry(MultiPolygon,${srid}) NOT NULL,
   type          text,
@@ -40,6 +40,6 @@ CREATE TABLE map_digitizer.polygon (
   hidden        boolean DEFAULT false,
   source        text,
   name          text,
-  FOREIGN KEY (type) REFERENCES map_digitizer.polygon_type(id) ON UPDATE CASCADE
+  FOREIGN KEY (type) REFERENCES ${schema~}.polygon_type(id) ON UPDATE CASCADE
 );
-CREATE INDEX map_digitizer_polygon_geometry_idx ON map_digitizer.polygon USING gist (geometry);
+CREATE INDEX ${schema^}_polygon_geometry_idx ON ${schema~}.polygon USING gist (geometry);
