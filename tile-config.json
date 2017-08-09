@@ -1,5 +1,5 @@
 {
-  "/imagery": "mapnik:///Users/Daven/Development/Syrtis/versioned/map-styles/_compiled/ortho.xml?bufferSize=0&metatile=4",
+  "/imagery": "mapnik:///Users/Daven/Development/Syrtis/versioned/map-styles/_compiled/imagery-mercator.xml?bufferSize=0",
   "/contour": "mapnik:///Users/Daven/Development/Syrtis/versioned/map-styles/_compiled/contour.xml"
 }
 
