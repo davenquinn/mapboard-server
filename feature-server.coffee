@@ -7,7 +7,7 @@ wkx = require 'wkx'
 {Buffer} = require 'buffer'
 {readdirSync} = require 'fs'
 
-db = pgp "postgres:///Naukluft"
+db = pgp "postgres:///syrtis"
 
 app = express()
 
