@@ -1,10 +1,13 @@
 #!/usr/bin/env zsh
+# Usage: run-server <tile-config.json> <opts> <database>
+# Order is enforced
 
 dn=${0:a:h}
 
 # Currently we serve tiles and features on two different ports but this is annoying for the long term
-$(npm bin)/tessera --require tilelive-mapnik --port 3005 --config ${dn}/tile-config.json & PIDTILES=$!
-coffee index.coffee $@ & PIDSERVER=$!
+$dn/node_modules/.bin/tessera --require tilelive-mapnik --port 3005 --config $1 & PIDTILES=$!
+shift
+coffee $dn/index.coffee $@ & PIDSERVER=$!
 
 wait $PIDTILES
 wait $PIDSERVER
