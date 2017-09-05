@@ -67,7 +67,7 @@ module.exports = (opts)->
       .then send(res)
 
   # Set up routes
-  app.post "/new-line",(req, res)->
+  app.post "/line/new",(req, res)->
     f = req.body
     data =
       geometry: f.geometry
@@ -81,7 +81,7 @@ module.exports = (opts)->
       .then serializeFeature
       .then send(res)
 
-  app.post "/delete", (req, res)->
+  app.post "/line/delete", (req, res)->
     db.query sql['delete-line'], id: req.body.id
       .then send(res)
 
