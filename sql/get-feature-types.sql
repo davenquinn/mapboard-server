@@ -1,7 +1,7 @@
 SELECT
   id,
   name,
-  color
+  coalesce(color, '#000000') color
 FROM
   ${schema~}.${table~}
 
