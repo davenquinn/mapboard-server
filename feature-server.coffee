@@ -97,8 +97,12 @@ module.exports = (opts)->
       .tap console.log
       .then send(res)
 
-  app.get "/types", (req, res)->
+  app.get "/line/types", (req, res)->
     db.query sql['get-feature-types'], {table: 'linework_type'}
+      .then send(res)
+
+  app.get "/polygon/types", (req, res)->
+    db.query sql['get-feature-types'], {table: 'polygon_type'}
       .then send(res)
 
   return app
