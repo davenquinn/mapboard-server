@@ -3,5 +3,5 @@ SELECT
   name,
   color
 FROM
-  ${schema~}.linework_type
+  ${schema~}.${table~}
 

@@ -98,7 +98,7 @@ module.exports = (opts)->
       .then send(res)
 
   app.get "/types", (req, res)->
-    db.query sql['get-feature-types']
+    db.query sql['get-feature-types'], {table: 'linework_type'}
       .then send(res)
 
   return app
