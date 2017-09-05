@@ -60,9 +60,9 @@ module.exports = (opts)->
   db.query sql['snap-function']
     .then -> console.log "SQL functions are set up!!!"
 
-  app.post "/features-in-area", (req, res)->
+  app.post "/line/features-in-area", (req, res)->
     env = req.body.envelope
-    db.query sql['get-features-in-area'], env
+    db.query sql['get-lines-in-area'], env
       .map serializeFeature
       .then send(res)
 
