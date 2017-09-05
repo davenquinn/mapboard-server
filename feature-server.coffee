@@ -24,6 +24,7 @@ serializeFeature = (r)->
   }
 
   # Handle erasing transparently-ish
+  # with an extension to the GeoJSON protocol
   r.erased ?= false
   if r.erased
     feature =
