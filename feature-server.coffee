@@ -1,11 +1,19 @@
 express = require 'express'
 bodyParser = require 'body-parser'
 Promise = require 'bluebird'
-pgp = require('pg-promise')(promiseLib: Promise)
+PGPromise = require('pg-promise')
 path = require 'path'
 wkx = require 'wkx'
 {Buffer} = require 'buffer'
 {readdirSync} = require 'fs'
+colors = require 'colors'
+
+logFunc = (e)->
+  console.log e.query
+  if e.params?
+    console.log "    "+e.params
+
+pgp = PGPromise(promiseLib: Promise, query: logFunc)
 
 ## Support functions ##
 
@@ -31,7 +39,6 @@ serializeFeature = (r)->
       type: 'DeletedFeature'
       id: r.id
 
-  console.log feature.type
   return feature
 
 parseGeometry = (f)->
@@ -39,7 +46,9 @@ parseGeometry = (f)->
   wkx.Geometry.parseGeoJSON(f.geometry).toEwkb()
 
 send = (res)->
-  (data)->res.send(data)
+  (data)->
+    console.log "#{data.length} rows returned\n".green
+    res.send(data)
 
 module.exports = (opts)->
   {dbname, schema} = opts
@@ -63,6 +72,12 @@ module.exports = (opts)->
   app.post "/line/features-in-area", (req, res)->
     env = req.body.envelope
     db.query sql['get-lines-in-area'], env
+      .map serializeFeature
+      .then send(res)
+
+  app.post "/polygon/features-in-area", (req, res)->
+    env = req.body.envelope
+    db.query sql['get-polygons-in-area'], env
       .map serializeFeature
       .then send(res)
 
