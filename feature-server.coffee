@@ -100,7 +100,7 @@ module.exports = (opts)->
     db.query sql['delete-line'], id: req.body.id
       .then send(res)
 
-  app.post "/erase", (req, res)->
+  app.post "/line/erase", (req, res)->
     # Erase features given a geojson polygon
     # Returns a list of replaced features
     f = req.body
@@ -118,6 +118,18 @@ module.exports = (opts)->
 
   app.get "/polygon/types", (req, res)->
     db.query sql['get-feature-types'], {table: 'polygon_type'}
+      .then send(res)
+
+  app.post "/polygon/erase", (req, res)->
+    # Erase features given a geojson polygon
+    # Returns a list of replaced features
+    f = req.body
+    data =
+      geometry: f.geometry
+      type: f.properties.type
+    db.query sql['erase-polygons'], data
+      .map serializeFeature
+      .tap console.log
       .then send(res)
 
   return app
