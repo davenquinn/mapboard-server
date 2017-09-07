@@ -10,7 +10,7 @@ VALUES (
           (SELECT ST_SRID(geometry) FROM ${schema~}.linework LIMIT 1)
         ),
         ${snap_width},
-        ${snap_types}
+        ${snap_types}::text[]
           -- types of accepted features
           ------ pass an empty array to disable snapping
           ------ null to enable uncritically
