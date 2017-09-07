@@ -24,7 +24,8 @@ SELECT
   type,
   pixel_width,
   map_width,
-  coalesce(color, '#888888') color
+  coalesce(color, '#888888') color, 
+  false AS erased
 FROM newline l
 JOIN ${schema~}.linework_type t
   ON l.type = t.id

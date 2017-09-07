@@ -91,9 +91,9 @@ module.exports = (opts)->
       map_width: f.properties.map_width
       zoom_level: f.properties.zoom_level
 
-    db.one sql['new-line'], data
+    db.query sql['new-line'], data
+      .map serializeFeature
       .tap console.log
-      .then serializeFeature
       .then send(res)
 
   # Set up routes
@@ -104,9 +104,9 @@ module.exports = (opts)->
       type: f.properties.type.trim()
       zoom_level: f.properties.zoom_level
 
-    db.one sql['new-polygon'], data
+    db.query sql['new-polygon'], data
       .tap console.log
-      .then serializeFeature
+      .map serializeFeature
       .then send(res)
 
   app.post "/line/delete", (req, res)->

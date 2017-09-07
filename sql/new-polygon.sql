@@ -18,7 +18,8 @@ SELECT
   f.id,
   ST_Transform(geometry, 4326) geometry,
   type,
-  coalesce(color, '#888888') color
+  coalesce(color, '#888888') color,
+  false AS erased
 FROM newfeature f
 JOIN ${schema~}.polygon_type t
   ON f.type = t.id
