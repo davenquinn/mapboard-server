@@ -24,4 +24,3 @@ FROM newfeature f
 JOIN ${schema~}.polygon_type t
   ON f.type = t.id
 
-

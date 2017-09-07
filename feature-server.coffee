@@ -99,14 +99,25 @@ module.exports = (opts)->
   # Set up routes
   app.post "/polygon/new",(req, res)->
     f = req.body
+    {avoid_overlap} = f.properties
+    avoid_overlap ?= true
     data =
       geometry: f.geometry
       type: f.properties.type.trim()
       zoom_level: f.properties.zoom_level
 
-    db.query sql['new-polygon'], data
-      .tap console.log
+    erased = []
+    if avoid_overlap
+      erased = await db.query sql['erase-polygons'], data
+        .map serializeFeature
+
+    data = await db.query sql['new-polygon'], data
       .map serializeFeature
+
+    newRes = data.concat erased
+    # If we don't want overlap
+    console.log newRes
+    Promise.resolve(newRes)
       .then send(res)
 
   app.post "/line/delete", (req, res)->
