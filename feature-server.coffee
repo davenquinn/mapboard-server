@@ -84,12 +84,20 @@ module.exports = (opts)->
   # Set up routes
   app.post "/line/new",(req, res)->
     f = req.body
-    data =
+    {snap_ratio, map_width, snap_types} = f.properties
+    snap_types ?= null # Default to snapping to all feature types
+    snap_ratio ?= 2 # Ratio of map width to snap amount
+    snap_width = snap_ratio*map_width
+
+    data = {
       geometry: f.geometry
       type: f.properties.type
       pixel_width: f.properties.pixel_width
       map_width: f.properties.map_width
       zoom_level: f.properties.zoom_level
+      snap_width
+      snap_types
+    }
 
     db.query sql['new-line'], data
       .map serializeFeature

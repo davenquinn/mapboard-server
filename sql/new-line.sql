@@ -9,11 +9,12 @@ VALUES (
           ST_SetSRID(ST_GeomFromGeoJSON(${geometry}), 4326),
           (SELECT ST_SRID(geometry) FROM ${schema~}.linework LIMIT 1)
         ),
-        ${map_width}*4,
-        null -- types of accepted features
-            ----- pass an empty array to disable snapping
-             ------ null to enable uncritically
-            --- and one-element array of values to snap to single layer
+        ${snap_width},
+        ${snap_types}
+          -- types of accepted features
+          ------ pass an empty array to disable snapping
+          ------ null to enable uncritically
+          ------ and one-element array of values to snap to single layer
       )
     )
   ),
