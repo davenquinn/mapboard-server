@@ -11,7 +11,7 @@ VALUES (
       ${map_width}*2
     )
   ),
-  ${type},
+  TRIM(${type}),
   ${pixel_width},
   ${map_width},
   ${zoom_level}

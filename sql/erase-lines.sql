@@ -9,7 +9,7 @@ SELECT
   ST_CoveredBy(l.geometry, e.geom) is_covered
 FROM ${schema~}.linework l
 JOIN eraser e ON ST_Intersects(l.geometry, e.geom)
-WHERE l.type = ${type}
+WHERE l.type = TRIM(${type})
   AND NOT l.hidden
 ),
 updated AS (

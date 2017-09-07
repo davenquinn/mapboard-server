@@ -96,6 +96,19 @@ module.exports = (opts)->
       .then serializeFeature
       .then send(res)
 
+  # Set up routes
+  app.post "/polygon/new",(req, res)->
+    f = req.body
+    data =
+      geometry: f.geometry
+      type: f.properties.type.trim()
+      zoom_level: f.properties.zoom_level
+
+    db.one sql['new-polygon'], data
+      .tap console.log
+      .then serializeFeature
+      .then send(res)
+
   app.post "/line/delete", (req, res)->
     db.query sql['delete-line'], id: req.body.id
       .then send(res)
@@ -106,7 +119,7 @@ module.exports = (opts)->
     f = req.body
     data =
       geometry: f.geometry
-      type: f.properties.type
+      type: f.properties.type.trim()
     db.query sql['erase-lines'], data
       .map serializeFeature
       .tap console.log
@@ -126,7 +139,7 @@ module.exports = (opts)->
     f = req.body
     data =
       geometry: f.geometry
-      type: f.properties.type
+      type: f.properties.type.trim()
     db.query sql['erase-polygons'], data
       .map serializeFeature
       .tap console.log
