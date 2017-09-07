@@ -3,12 +3,14 @@ INSERT INTO ${schema~}.linework
   (geometry, type, pixel_width, map_width, zoom_level)
 VALUES (
   ST_Multi(
-    Linework_SnapEndpoints(
-      ST_Transform(
-        ST_SetSRID(ST_GeomFromGeoJSON(${geometry}), 4326),
-        (SELECT ST_SRID(geometry) FROM ${schema~}.linework LIMIT 1)
-      ),
-      ${map_width}*2
+    ST_MakeValid(
+      Linework_SnapEndpoints(
+        ST_Transform(
+          ST_SetSRID(ST_GeomFromGeoJSON(${geometry}), 4326),
+          (SELECT ST_SRID(geometry) FROM ${schema~}.linework LIMIT 1)
+        ),
+        ${map_width}*2
+      )
     )
   ),
   TRIM(${type}),
