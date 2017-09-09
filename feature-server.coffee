@@ -107,19 +107,16 @@ module.exports = (opts)->
   # Set up routes
   app.post "/polygon/new",(req, res)->
     f = req.body
-    {avoid_overlap} = f.properties
+    {geometry, properties} = f
+    {avoid_overlap, zoom_level, type} = properties
     avoid_overlap ?= true
-    data =
-      geometry: f.geometry
-      type: f.properties.type.trim()
-      zoom_level: f.properties.zoom_level
 
     erased = []
     if avoid_overlap
-      erased = await db.query sql['erase-polygons'], data
+      erased = await db.query sql['erase-polygons'], {geometry, types: []}
         .map serializeFeature
 
-    data = await db.query sql['new-polygon'], data
+    data = await db.query sql['new-polygon'], {geometry, zoom_level, type}
       .map serializeFeature
 
     newRes = data.concat erased
@@ -138,7 +135,7 @@ module.exports = (opts)->
     f = req.body
     data =
       geometry: f.geometry
-      type: f.properties.type.trim()
+      types: f.properties.erase_types or []
     db.query sql['erase-lines'], data
       .map serializeFeature
       .tap console.log
@@ -158,7 +155,7 @@ module.exports = (opts)->
     f = req.body
     data =
       geometry: f.geometry
-      type: f.properties.type.trim()
+      types: f.properties.erase_types or []
     db.query sql['erase-polygons'], data
       .map serializeFeature
       .tap console.log

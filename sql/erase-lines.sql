@@ -9,7 +9,12 @@ SELECT
   ST_CoveredBy(l.geometry, e.geom) is_covered
 FROM ${schema~}.linework l
 JOIN eraser e ON ST_Intersects(l.geometry, e.geom)
-WHERE l.type = TRIM(${type})
+-- The below line sets which features are erased.
+-- The value `types` can be set to the following:
+--  `null`: Any type will be erased
+-- An empty array: no types will be erased (a no-op).
+-- An array of types: types in that array will be erased.
+WHERE coalesce(l.type = ANY(${types}::text[]), true)
   AND NOT l.hidden
 ),
 updated AS (

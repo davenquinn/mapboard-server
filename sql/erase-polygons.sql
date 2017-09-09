@@ -11,7 +11,9 @@ SELECT
   ST_CoveredBy(l.geometry, e.geom) is_covered
 FROM ${schema~}.polygon l
 JOIN eraser e ON ST_Intersects(l.geometry, e.geom)
-WHERE l.type = TRIM(${type})
+WHERE coalesce(l.type = ANY(${types}::text[]), true)
+-- default to erasing everything
+-- to spare us long lists of types for an obvious use case
   AND NOT l.hidden
 ),
 updated AS (
