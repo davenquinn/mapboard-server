@@ -50,7 +50,7 @@ SELECT
   l.geometry,
   l.type,
   coalesce(l.pixel_width,2) pixel_width,
-  coalesce(l.map_width,5) map_width,
+  coalesce(l.map_width,40) map_width,
   coalesce(t.color, '#888888') color,
   erased
 FROM results l
