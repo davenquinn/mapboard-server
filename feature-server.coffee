@@ -113,7 +113,8 @@ module.exports = (opts)->
 
     erased = []
     if avoid_overlap
-      erased = await db.query sql['erase-polygons'], {geometry, types: []}
+      # Null for 'types' erases all types
+      erased = await db.query sql['erase-polygons'], {geometry, types: null}
         .map serializeFeature
 
     data = await db.query sql['new-polygon'], {geometry, zoom_level, type}
@@ -129,17 +130,21 @@ module.exports = (opts)->
     db.query sql['delete-line'], id: req.body.id
       .then send(res)
 
-  app.post "/line/erase", (req, res)->
+  erase = (procName)->(req, res)->
     # Erase features given a geojson polygon
     # Returns a list of replaced features
     f = req.body
-    data =
-      geometry: f.geometry
-      types: f.properties.erase_types or []
-    db.query sql['erase-lines'], data
+    {geometry} = f
+    {erase_types} = f.properties
+    types = erase_types or []
+
+    db.query sql["erase-#{procName}"], {geometry, types}
       .map serializeFeature
       .tap console.log
       .then send(res)
+
+  app.post "/line/erase", erase("lines")
+  app.post "/polygon/erase", erase("polygons")
 
   app.get "/line/types", (req, res)->
     db.query sql['get-feature-types'], {table: 'linework_type'}
@@ -147,18 +152,6 @@ module.exports = (opts)->
 
   app.get "/polygon/types", (req, res)->
     db.query sql['get-feature-types'], {table: 'polygon_type'}
-      .then send(res)
-
-  app.post "/polygon/erase", (req, res)->
-    # Erase features given a geojson polygon
-    # Returns a list of replaced features
-    f = req.body
-    data =
-      geometry: f.geometry
-      types: f.properties.erase_types or []
-    db.query sql['erase-polygons'], data
-      .map serializeFeature
-      .tap console.log
       .then send(res)
 
   return app

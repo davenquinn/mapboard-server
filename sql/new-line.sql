@@ -18,7 +18,7 @@ VALUES (
       )
     )
   ),
-  TRIM(${type}),
+  ${type},
   ${pixel_width},
   ${map_width},
   ${zoom_level}
