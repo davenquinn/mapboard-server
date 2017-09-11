@@ -29,7 +29,6 @@ SELECT
   l.id,
   ST_Transform(geometry, 4326) geometry,
   type,
-  pixel_width,
   map_width,
   coalesce(color, '#888888') color,
   false AS erased

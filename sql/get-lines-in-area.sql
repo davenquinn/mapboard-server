@@ -2,8 +2,7 @@ SELECT
   l.id,
   ST_Transform(geometry, 4326) geometry,
   type,
-  coalesce(pixel_width,2) pixel_width,
-  coalesce(map_width,5) map_width,
+  map_width,
   coalesce(color, '#888888') color
 FROM
   ${schema~}.linework l

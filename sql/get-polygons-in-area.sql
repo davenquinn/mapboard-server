@@ -2,6 +2,7 @@ SELECT
   l.id,
   ST_Transform(geometry, 4326) geometry,
   type,
+  map_width,
   coalesce(color, '#888888') color
 FROM
   ${schema~}.polygon l
