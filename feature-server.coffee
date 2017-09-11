@@ -136,7 +136,7 @@ module.exports = (opts)->
     f = req.body
     {geometry} = f
     {erase_types} = f.properties
-    types = erase_types or []
+    types = erase_types or null
 
     db.query sql["erase-#{procName}"], {geometry, types}
       .map serializeFeature
