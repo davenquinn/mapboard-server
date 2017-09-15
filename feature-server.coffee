@@ -42,8 +42,9 @@ serializeFeature = (r)->
   return feature
 
 parseGeometry = (f)->
-  # Parses a geojson feature to geometry
-  wkx.Geometry.parse(f.geometry).toEwkb()
+  # Parses a geojson (or wkb, or ewkb) feature to geometry
+  console.log f.geometry
+  wkx.Geometry.parse(f.geometry).toEwkb().toString("hex")
 
 send = (res)->
   (data)->
@@ -89,7 +90,7 @@ module.exports = (opts)->
     snap_width ?= 2*map_width
 
     data = {
-      geometry: f.geometry
+      geometry: parseGeometry(f)
       type: f.properties.type
       pixel_width: f.properties.pixel_width
       zoom_level: f.properties.zoom_level
@@ -107,7 +108,8 @@ module.exports = (opts)->
   # Set up routes
   app.post "/polygon/new",(req, res)->
     f = req.body
-    {geometry, properties} = f
+    {properties} = f
+    geometry = parseGeometry(f)
     {allow_overlap} = properties
     allow_overlap ?= false
     erased = []
@@ -136,7 +138,7 @@ module.exports = (opts)->
     # Erase features given a geojson polygon
     # Returns a list of replaced features
     f = req.body
-    {geometry} = f
+    geometry = parseGeometry f
     {erase_types} = f.properties
     types = erase_types or null
 

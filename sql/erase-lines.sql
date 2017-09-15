@@ -1,6 +1,6 @@
 WITH eraser AS (
 SELECT ST_Transform(
-  ST_SetSRID(ST_GeomFromGeoJSON(${geometry}), 4326),
+  ST_SetSRID(${geometry}::geometry, 4326),
   (SELECT ST_SRID(geometry) FROM ${schema~}.linework LIMIT 1)) AS geom
 ),
 features AS (
