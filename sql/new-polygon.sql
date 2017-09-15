@@ -1,6 +1,6 @@
 WITH newfeature AS (
 INSERT INTO ${schema~}.polygon
-  (geometry, type, zoom_level)
+  (geometry, type, pixel_width, map_width, zoom_level)
 VALUES (
   ST_Multi(
     ST_MakeValid(
@@ -10,6 +10,8 @@ VALUES (
     ))
   ),
   TRIM(${type}),
+  ${pixel_width},
+  ${map_width},
   ${zoom_level}
   )
 RETURNING *

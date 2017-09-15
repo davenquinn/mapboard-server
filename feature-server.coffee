@@ -40,7 +40,6 @@ serializeFeature = (r)->
     feature =
       type: 'DeletedFeature'
       id: r.id
-
   return feature
 
 parseGeometry = (f)->
@@ -110,21 +109,19 @@ module.exports = (opts)->
   app.post "/polygon/new",(req, res)->
     f = req.body
     {geometry, properties} = f
-    {avoid_overlap, zoom_level, type} = properties
-    avoid_overlap ?= true
-
+    {allow_overlap} = properties
+    allow_overlap ?= false
     erased = []
-    if avoid_overlap
+    if not allow_overlap
       # Null for 'types' erases all types
       erased = await db.query sql['erase-polygons'], {geometry, types: null}
         .map serializeFeature
 
-    data = await db.query sql['new-polygon'], {geometry, zoom_level, type}
+    data = await db.query sql['new-polygon'], {geometry, properties...}
       .map serializeFeature
 
     newRes = data.concat erased
     # If we don't want overlap
-    console.log newRes
     Promise.resolve(newRes)
       .then send(res)
 
