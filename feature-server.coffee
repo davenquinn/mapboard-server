@@ -19,7 +19,8 @@ pgp = PGPromise(promiseLib: Promise, query: logFunc)
 
 serializeFeature = (r)->
   _ = new Buffer(r.geometry,'hex')
-  geometry = wkx.Geometry.parse(_).toGeoJSON()
+  geomBuffer = wkx.Geometry.parse(_).toWkb()
+  geometry = geomBuffer.toString 'base64'
   {id, pixel_width, map_width} = r
 
   feature = {
@@ -44,7 +45,7 @@ serializeFeature = (r)->
 
 parseGeometry = (f)->
   # Parses a geojson feature to geometry
-  wkx.Geometry.parseGeoJSON(f.geometry).toEwkb()
+  wkx.Geometry.parse(f.geometry).toEwkb()
 
 send = (res)->
   (data)->
