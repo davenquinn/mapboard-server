@@ -18,9 +18,7 @@ pgp = PGPromise(promiseLib: Promise, query: logFunc)
 ## Support functions ##
 
 serializeFeature = (r)->
-  _ = new Buffer(r.geometry,'hex')
-  geomBuffer = wkx.Geometry.parse(_).toWkb()
-  geometry = geomBuffer.toString 'base64'
+  geometry = new Buffer(r.geometry,'hex').toString 'base64'
   {id, pixel_width, map_width} = r
 
   feature = {
