@@ -19,16 +19,18 @@ pgp = PGPromise(promiseLib: Promise, query: logFunc)
 
 serializeFeature = (r)->
   _ = new Buffer(r.geometry,'hex')
-  geom = wkx.Geometry.parse(_).toGeoJSON()
+  geometry = wkx.Geometry.parse(_).toGeoJSON()
+  {id, pixel_width, map_width} = r
+
   feature = {
     type: 'Feature'
-    geometry: geom
-    properties:
-      type: r.type
-      color: r.color
-      pixel_width: r.pixel_width
-      map_width: r.map_width
-    id: r.id
+    geometry, id
+    properties: {
+      type: r.type.trim()
+      color: r.color.trim()
+      pixel_width
+      map_width
+    }
   }
 
   # Handle erasing transparently-ish
@@ -128,6 +130,10 @@ module.exports = (opts)->
 
   app.post "/line/delete", (req, res)->
     db.query sql['delete-line'], id: req.body.id
+      .then send(res)
+
+  app.post "/polygon/delete", (req, res)->
+    db.query sql['delete-polygon'], id: req.body.id
       .then send(res)
 
   erase = (procName)->(req, res)->
