@@ -19,7 +19,7 @@ pgp = PGPromise(promiseLib: Promise, query: logFunc)
 
 serializeFeature = (r)->
   geometry = new Buffer(r.geometry,'hex').toString 'base64'
-  {id, pixel_width, map_width} = r
+  {id, pixel_width, map_width, certainty} = r
 
   feature = {
     type: 'Feature'
@@ -29,6 +29,7 @@ serializeFeature = (r)->
       color: r.color.trim()
       pixel_width
       map_width
+      certainty
     }
   }
 
@@ -85,18 +86,13 @@ module.exports = (opts)->
   # Set up routes
   app.post "/line/new",(req, res)->
     f = req.body
-    {snap_width, map_width, snap_types} = f.properties
-    snap_types ?= null # Default to snapping to all feature types
-    snap_width ?= 2*map_width
+    p = f.properties
+    p.snap_types ?= null
+    p.snap_width ?= 2*map_width
 
     data = {
       geometry: parseGeometry(f)
-      type: f.properties.type
-      pixel_width: f.properties.pixel_width
-      zoom_level: f.properties.zoom_level
-      map_width
-      snap_width
-      snap_types
+      p...
     }
 
     console.log data

@@ -27,6 +27,7 @@ RETURNING
   ST_Transform(l.geometry, 4326) geometry,
   l.type,
   l.map_width,
+  l.certainty,
   false AS erased
 ),
 deleted AS (
@@ -40,6 +41,7 @@ RETURNING
   ST_Transform(l.geometry, 4326) geometry,
   l.type,
   l.map_width,
+  l.certainty,
   true AS erased
 ),
 results AS (
@@ -52,6 +54,7 @@ SELECT
   l.geometry,
   l.type,
   map_width,
+  l.certainty,
   coalesce(t.color, '#888888') color,
   erased
 FROM results l

@@ -3,6 +3,7 @@ SELECT
   ST_Transform(geometry, 4326) geometry,
   type,
   map_width,
+  certainty,
   coalesce(color, '#888888') color
 FROM
   ${schema~}.linework l

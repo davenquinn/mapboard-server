@@ -1,6 +1,6 @@
 WITH newfeature AS (
 INSERT INTO ${schema~}.polygon
-  (geometry, type, pixel_width, map_width, zoom_level)
+  (geometry, type, pixel_width, map_width, certainty, zoom_level)
 VALUES (
   ST_Multi(
     ST_MakeValid(
@@ -9,9 +9,10 @@ VALUES (
       (SELECT ST_SRID(geometry) FROM ${schema~}.polygon LIMIT 1)
     ))
   ),
-  TRIM(${type}),
+  ${type},
   ${pixel_width},
   ${map_width},
+  ${certainty},
   ${zoom_level}
   )
 RETURNING *
@@ -21,6 +22,7 @@ SELECT
   ST_Transform(geometry, 4326) geometry,
   type,
   map_width,
+  certainty,
   coalesce(color, '#888888') color,
   false AS erased
 FROM newfeature f

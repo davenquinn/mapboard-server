@@ -1,6 +1,6 @@
 WITH newline AS (
 INSERT INTO ${schema~}.linework
-  (geometry, type, pixel_width, map_width, zoom_level)
+  (geometry, type, pixel_width, map_width, certainty, zoom_level)
 VALUES (
   ST_Multi(
     ST_MakeValid(
@@ -21,6 +21,7 @@ VALUES (
   ${type},
   ${pixel_width},
   ${map_width},
+  ${certainty},
   ${zoom_level}
   )
 RETURNING *
@@ -30,6 +31,7 @@ SELECT
   ST_Transform(geometry, 4326) geometry,
   type,
   map_width,
+  certainty,
   coalesce(color, '#888888') color,
   false AS erased
 FROM newline l

@@ -29,6 +29,7 @@ RETURNING
   l.type,
   l.pixel_width,
   l.map_width,
+  l.certainty,
   false AS erased
 ),
 deleted AS (
@@ -43,6 +44,7 @@ RETURNING
   l.type,
   l.pixel_width,
   l.map_width,
+  l.certainty,
   true AS erased
 ),
 results AS (
@@ -56,6 +58,7 @@ SELECT
   l.type,
   coalesce(l.pixel_width,2) pixel_width,
   l.map_width,
+  l.certainty,
   coalesce(t.color, '#888888') color,
   erased
 FROM results l
