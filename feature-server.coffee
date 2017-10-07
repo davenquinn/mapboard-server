@@ -3,9 +3,8 @@ bodyParser = require 'body-parser'
 Promise = require 'bluebird'
 PGPromise = require('pg-promise')
 path = require 'path'
-wkx = require 'wkx'
-{Buffer} = require 'buffer'
 {readdirSync} = require 'fs'
+{serializeFeature, parseGeometry, send} = require './util'
 colors = require 'colors'
 
 logFunc = (e)->
@@ -14,43 +13,6 @@ logFunc = (e)->
     console.log "    "+e.params
 
 pgp = PGPromise(promiseLib: Promise, query: logFunc)
-
-## Support functions ##
-
-serializeFeature = (r)->
-  geometry = new Buffer(r.geometry,'hex').toString 'base64'
-  {id, pixel_width, map_width, certainty} = r
-
-  feature = {
-    type: 'Feature'
-    geometry, id
-    properties: {
-      type: r.type.trim()
-      color: r.color.trim()
-      pixel_width
-      map_width
-      certainty
-    }
-  }
-
-  # Handle erasing transparently-ish
-  # with an extension to the GeoJSON protocol
-  r.erased ?= false
-  if r.erased
-    feature =
-      type: 'DeletedFeature'
-      id: r.id
-  return feature
-
-parseGeometry = (f)->
-  # Parses a geojson (or wkb, or ewkb) feature to geometry
-  console.log f.geometry
-  wkx.Geometry.parse(f.geometry).toEwkb().toString("hex")
-
-send = (res)->
-  (data)->
-    console.log "#{data.length} rows returned\n".green
-    res.send(data)
 
 module.exports = (opts)->
   {dbname, schema} = opts
