@@ -11,9 +11,9 @@ serializeFeature = (r)->
     properties: {
       type: r.type.trim()
       color: r.color.trim()
-      pixel_width
-      map_width
-      certainty
+      pixel_width: 5
+      map_width: 5
+      certainty: null
     }
   }
 

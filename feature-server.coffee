@@ -20,15 +20,18 @@ module.exports = (opts)->
   app = express()
   app.use bodyParser.json()
 
-  opts.schema ?= 'map_digitizer'
+  opts.schema ?= 'public'
+  opts.table ?= 'dataset_feature'
 
   ## Prepare SQL queries
-  dn = path.join __dirname,'sql'
+  dn = path.join __dirname,'sql-arbitrary-layer'
   sql = {}
   for fn in readdirSync(dn)
     key = path.basename(fn,'.sql')
     _ = path.join(dn,fn)
-    sql[key] = pgp.QueryFile _, minify: true, debug: true, params: {schema}
+    sql[key] = pgp.QueryFile _, {
+      minify: true, debug: true, params: {schema, table}
+    }
 
   db.query sql['snap-function']
     .then -> console.log "SQL functions are set up!!!"
@@ -49,7 +52,18 @@ module.exports = (opts)->
   app.post "/line/new",(req, res)->
     f = req.body
     p = f.properties
-    p.snap_types ?= null
+    # Right now we are just disabling snapping by
+    # fiat. We need to make sure we are always working
+    # in a reasonable coordinate system if snapping
+    # is enabled.
+    # I suppose that the user can be expected to provide
+    # the data in a meters-based coordinate system for interoperability
+    # with snapping code? IDK. Or snapping can be accomplished in the
+    # EPSG:3857 frame...
+    #
+    # TODO: Figure out best practices for this.
+    if true #snappingDisabled
+      p.snap_types ?= []
     p.snap_width ?= 2*map_width
 
     data = {
@@ -100,6 +114,7 @@ module.exports = (opts)->
     {erase_types} = f.properties
     types = erase_types or null
 
+    # We can only erase a single type for now
     db.query sql["erase-#{procName}"], {geometry, types}
       .map serializeFeature
       .tap console.log
@@ -108,13 +123,15 @@ module.exports = (opts)->
   app.post "/line/erase", erase("lines")
   app.post "/polygon/erase", erase("polygons")
 
-  app.get "/line/types", (req, res)->
-    db.query sql['get-feature-types'], {table: 'linework_type'}
-      .then send(res)
+  getTypes = -> (req, res)->
+    # Right now we only have a concept of types that maps
+    # directly to layers, with no added data provided.
+    res = [{id: table, name: table, color: '#000000'}]
+    send(res)
 
-  app.get "/polygon/types", (req, res)->
-    db.query sql['get-feature-types'], {table: 'polygon_type'}
-      .then send(res)
+
+  app.get "/line/types", getTypes()
+  app.get "/polygon/types", getTypes()
 
   return app
 
