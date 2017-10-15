@@ -10,9 +10,9 @@ serializeFeature = (r)->
     geometry, id
     properties: {
       type: r.type.trim()
-      color: r.color.trim()
-      pixel_width: 5
-      map_width: 5
+      color: "#ff0000"
+      pixel_width
+      map_width
       certainty: null
     }
   }

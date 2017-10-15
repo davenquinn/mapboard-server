@@ -8,6 +8,11 @@ closestPoint geometry;
 res geometry;
 ix int;
 
+IF ST_Dimension(geom) = 2 THEN
+  -- We have polygons
+  RETURN geom;
+END IF;
+
 BEGIN
  -- DO for both start and endpoints
 FOREACH ix IN ARRAY ARRAY[0,-1]
