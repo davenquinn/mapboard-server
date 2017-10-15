@@ -125,8 +125,8 @@ module.exports = (opts)->
   getTypes = (req, res)->
     # Right now we only have a concept of types that maps
     # directly to layers, with no added data provided.
-    res = [{id: 'default', name: opts.table, color: '#ff0000'}]
-    send(res)
+    Promise.resolve [{id: 'default', name: opts.table, color: '#ff0000'}]
+      .then send(res)
 
 
   app.get "/line/types", getTypes

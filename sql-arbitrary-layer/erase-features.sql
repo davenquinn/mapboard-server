@@ -36,7 +36,7 @@ WHERE l.id = f.id
   AND f.is_covered
 RETURNING
   l.id,
-  ST_Transform(l.geometry, 4326) geometry,
+  ST_Multi(ST_Transform(l.geometry, 4326)) geometry,
   true AS erased
 )
 SELECT * FROM updated
