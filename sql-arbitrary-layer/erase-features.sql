@@ -19,13 +19,13 @@ JOIN eraser e ON ST_Intersects(l.geometry, e.geom)
 ),
 updated AS (
 UPDATE ${schema~}.${table~} l
-SET geometry = ST_Multi(ST_Difference(l.geometry, e.geom))
+SET geometry = ST_Difference(l.geometry, e.geom)
 FROM eraser e, features f
 WHERE f.id = l.id
   AND NOT f.is_covered
 RETURNING
   l.id,
-  ST_Transform(l.geometry, 4326) geometry,
+  ST_Multi(ST_Transform(l.geometry, 4326)) geometry,
   false AS erased
 ),
 deleted AS (

@@ -15,13 +15,14 @@ logFunc = (e)->
 pgp = PGPromise(promiseLib: Promise, query: logFunc)
 
 module.exports = (opts)->
-  {dbname, schema} = opts
+  opts.schema = 'public'
+  opts.table = 'dataset_feature'
+  {dbname, schema, table} = opts
+
+  snapFunction = "#{schema}.#{table}_LineworkSnap"
   db = pgp "postgres:///#{dbname}"
   app = express()
   app.use bodyParser.json()
-
-  opts.schema ?= 'public'
-  opts.table ?= 'dataset_feature'
 
   ## Prepare SQL queries
   dn = path.join __dirname,'sql-arbitrary-layer'
@@ -30,7 +31,7 @@ module.exports = (opts)->
     key = path.basename(fn,'.sql')
     _ = path.join(dn,fn)
     sql[key] = pgp.QueryFile _, {
-      minify: true, debug: true, params: {schema, table}
+      minify: true, debug: true, params: {schema, table, snapFunction}
     }
 
   db.query sql['snap-function']
@@ -38,12 +39,13 @@ module.exports = (opts)->
 
   app.post "/line/features-in-area", (req, res)->
     env = req.body.envelope
-    db.query sql['get-lines-in-area'], env
+    db.query sql['lines-in-area'], env
       .map serializeFeature
       .then send(res)
 
   app.post "/polygon/features-in-area", (req, res)->
-    Promise.resolve([])
+    env = req.body.envelope
+    db.query sql['polygons-in-area'], env
       .map serializeFeature
       .then send(res)
 
@@ -123,7 +125,7 @@ module.exports = (opts)->
   getTypes = (req, res)->
     # Right now we only have a concept of types that maps
     # directly to layers, with no added data provided.
-    res = [{id: 'default', name: table, color: '#ff0000'}]
+    res = [{id: 'default', name: opts.table, color: '#ff0000'}]
     send(res)
 
 

@@ -4,7 +4,7 @@ INSERT INTO ${schema~}.${table~}
 VALUES (
   ST_Multi(
     ST_MakeValid(
-      Linework_SnapEndpoints(
+      ${table~}_SnapEndpoints(
         ST_Transform(
           ST_SetSRID(${geometry}::geometry, 4326),
           (SELECT ST_SRID(geometry) FROM ${schema~}.${table~} LIMIT 1)

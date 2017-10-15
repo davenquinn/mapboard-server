@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION ${schema}.${table~}_SnapEndpoints(geom geometry, width numeric)
+CREATE OR REPLACE FUNCTION ${snapFunction~}(geom geometry, width numeric)
     RETURNS geometry AS
 $$
 DECLARE
@@ -8,12 +8,13 @@ closestPoint geometry;
 res geometry;
 ix int;
 
+BEGIN
+
 IF ST_Dimension(geom) = 2 THEN
   -- We have polygons
   RETURN geom;
 END IF;
 
-BEGIN
  -- DO for both start and endpoints
 FOREACH ix IN ARRAY ARRAY[0,-1]
 LOOP
