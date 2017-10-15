@@ -1,5 +1,5 @@
 WITH newline AS (
-INSERT INTO ${schema~}.linework
+INSERT INTO ${schema~}.${table~}
   (geometry, type, pixel_width, map_width, certainty, zoom_level)
 VALUES (
   ST_Multi(
@@ -7,7 +7,7 @@ VALUES (
       Linework_SnapEndpoints(
         ST_Transform(
           ST_SetSRID(${geometry}::geometry, 4326),
-          (SELECT ST_SRID(geometry) FROM ${schema~}.linework LIMIT 1)
+          (SELECT ST_SRID(geometry) FROM ${schema~}.${table~} LIMIT 1)
         ),
         ${snap_width},
         ${snap_types}::text[]

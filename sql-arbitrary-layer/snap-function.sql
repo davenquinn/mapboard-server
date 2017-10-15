@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION Linework_SnapEndpoints(geom geometry, width numeric, types text[])
+CREATE OR REPLACE FUNCTION ${schema}.${table~}_SnapEndpoints(geom geometry, width numeric)
     RETURNS geometry AS
 $$
 DECLARE
@@ -23,10 +23,8 @@ LOOP
   SELECT
     ST_ClosestPoint(ST_Intersection(l.geometry, buffer), point)
   INTO closestPoint
-  FROM ${schema~}.linework l
-  WHERE ST_Intersects(l.geometry, buffer)
-    AND NOT l.hidden
-    AND coalesce((l.type = ANY(types)), true);
+  FROM ${schema~}.${table~} l
+  WHERE ST_Intersects(l.geometry, buffer);
 
   -- We have a geometry to append to
   IF closestPoint IS NOT null THEN

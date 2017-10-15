@@ -1,12 +1,12 @@
 WITH newfeature AS (
-INSERT INTO ${schema~}.polygon
+INSERT INTO ${schema~}.${polygon~}
   (geometry, type, pixel_width, map_width, certainty, zoom_level)
 VALUES (
   ST_Multi(
     ST_MakeValid(
       ST_Transform(
       ST_SetSRID(${geometry}::geometry, 4326),
-      (SELECT ST_SRID(geometry) FROM ${schema~}.polygon LIMIT 1)
+      (SELECT ST_SRID(geometry) FROM ${schema~}.${polygon~} LIMIT 1)
     ))
   ),
   ${type},
