@@ -16,8 +16,6 @@ JOIN eraser e ON ST_Intersects(l.geometry, e.geom)
 -- An array of types: types in that array will be erased.
 -- NOTE: this doesn't really matter for arbitrary layers
 -- unless we set up a field to group on.
-WHERE coalesce(l.type = ANY(${types}::text[]), true)
-  AND NOT l.hidden
 ),
 updated AS (
 UPDATE ${schema~}.${table~} l
@@ -28,10 +26,6 @@ WHERE f.id = l.id
 RETURNING
   l.id,
   ST_Transform(l.geometry, 4326) geometry,
-  l.type,
-  l.pixel_width,
-  l.map_width,
-  l.certainty,
   false AS erased
 ),
 deleted AS (
@@ -43,27 +37,9 @@ WHERE l.id = f.id
 RETURNING
   l.id,
   ST_Transform(l.geometry, 4326) geometry,
-  l.type,
-  l.pixel_width,
-  l.map_width,
-  l.certainty,
   true AS erased
-),
-results AS (
+)
 SELECT * FROM updated
 UNION ALL
 SELECT * FROM deleted
-)
-SELECT
-  l.id,
-  l.geometry,
-  l.type,
-  coalesce(l.pixel_width,2) pixel_width,
-  l.map_width,
-  l.certainty,
-  coalesce(t.color, '#888888') color,
-  erased
-FROM results l
-JOIN ${schema~}.${table~}_type t
-  ON l.type = t.id
 

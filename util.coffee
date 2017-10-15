@@ -3,15 +3,17 @@
 
 serializeFeature = (r)->
   geometry = new Buffer(r.geometry,'hex').toString 'base64'
-  {id, pixel_width, map_width, certainty} = r
+  {id, map_width} = r
+
+  map_width ?= 1
 
   feature = {
     type: 'Feature'
     geometry, id
     properties: {
-      type: r.type.trim()
+      type: 'default'
       color: "#ff0000"
-      pixel_width
+      pixel_width: 5
       map_width
       certainty: null
     }

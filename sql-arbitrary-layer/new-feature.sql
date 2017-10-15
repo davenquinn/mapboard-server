@@ -19,7 +19,6 @@ RETURNING *
 SELECT
   l.id,
   ST_Transform(geometry, 4326) geometry,
-  ${type} type,
   ${map_width} map_width,
   false AS erased
 FROM newline l

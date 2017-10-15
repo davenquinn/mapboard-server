@@ -43,8 +43,7 @@ module.exports = (opts)->
       .then send(res)
 
   app.post "/polygon/features-in-area", (req, res)->
-    env = req.body.envelope
-    db.query sql['get-polygons-in-area'], env
+    Promise.resolve([])
       .map serializeFeature
       .then send(res)
 
@@ -62,9 +61,7 @@ module.exports = (opts)->
     # EPSG:3857 frame...
     #
     # TODO: Figure out best practices for this.
-    if true #snappingDisabled
-      p.snap_types ?= []
-    p.snap_width ?= 2*map_width
+    p.snap_width ?= 2*p.map_width
 
     data = {
       geometry: parseGeometry(f)
@@ -80,17 +77,19 @@ module.exports = (opts)->
   # Set up routes
   app.post "/polygon/new",(req, res)->
     f = req.body
-    {properties} = f
+    p = f.properties
+
+    p.snap_width ?= 2*p.map_width
+
     geometry = parseGeometry(f)
-    {allow_overlap} = properties
+    {allow_overlap} = p
     allow_overlap ?= false
     erased = []
     if not allow_overlap
-      # Null for 'types' erases all types
-      erased = await db.query sql['erase-polygons'], {geometry, types: null}
+      erased = await db.query sql['erase-features'], {geometry}
         .map serializeFeature
 
-    data = await db.query sql['new-polygon'], {geometry, properties...}
+    data = await db.query sql['new-feature'], {geometry, p...}
       .map serializeFeature
 
     newRes = data.concat erased
@@ -99,39 +98,37 @@ module.exports = (opts)->
       .then send(res)
 
   app.post "/line/delete", (req, res)->
-    db.query sql['delete-line'], id: req.body.id
+    db.query sql['delete-feature'], id: req.body.id
       .then send(res)
 
   app.post "/polygon/delete", (req, res)->
-    db.query sql['delete-polygon'], id: req.body.id
+    db.query sql['delete-feature'], id: req.body.id
       .then send(res)
 
-  erase = (procName)->(req, res)->
+  erase = (req, res)->
     # Erase features given a geojson polygon
     # Returns a list of replaced features
     f = req.body
     geometry = parseGeometry f
-    {erase_types} = f.properties
-    types = erase_types or null
 
     # We can only erase a single type for now
-    db.query sql["erase-#{procName}"], {geometry, types}
+    db.query sql["erase-features"], {geometry}
       .map serializeFeature
       .tap console.log
       .then send(res)
 
-  app.post "/line/erase", erase("lines")
-  app.post "/polygon/erase", erase("polygons")
+  app.post "/line/erase", erase
+  app.post "/polygon/erase", erase
 
-  getTypes = -> (req, res)->
+  getTypes = (req, res)->
     # Right now we only have a concept of types that maps
     # directly to layers, with no added data provided.
-    res = [{id: table, name: table, color: '#000000'}]
+    res = [{id: 'default', name: table, color: '#ff0000'}]
     send(res)
 
 
-  app.get "/line/types", getTypes()
-  app.get "/polygon/types", getTypes()
+  app.get "/line/types", getTypes
+  app.get "/polygon/types", getTypes
 
   return app
 
