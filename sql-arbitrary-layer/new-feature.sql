@@ -3,13 +3,13 @@ INSERT INTO ${schema~}.${table~}
   (geometry)
 VALUES (
   ST_MakeValid(
-    ${snapFunction~}(
+    --${snapFunction~}(
       ST_Transform(
         ST_SetSRID(${geometry}::geometry, 4326),
         (SELECT ST_SRID(geometry) FROM ${schema~}.${table~} LIMIT 1)
-      ),
-      ${snap_width}
-    )
+      )--,
+    --  ${snap_width}
+    --)
   )
 )
 RETURNING *

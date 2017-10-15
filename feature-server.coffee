@@ -71,7 +71,7 @@ module.exports = (opts)->
     }
 
     console.log data
-    db.query sql['new-line'], data
+    db.query sql['new-feature'], data
       .map serializeFeature
       .tap console.log
       .then send(res)
@@ -125,7 +125,7 @@ module.exports = (opts)->
   getTypes = (req, res)->
     # Right now we only have a concept of types that maps
     # directly to layers, with no added data provided.
-    Promise.resolve [{id: 'default', name: opts.table, color: '#ff0000'}]
+    db.query sql['feature-types']
       .then send(res)
 
 
