@@ -13,7 +13,14 @@ logFunc = (e)->
   if e.params?
     console.log "    "+e.params
 
-pgp = PGPromise(promiseLib: Promise, query: logFunc)
+connectFunc = (client, dc, isFresh)->
+  if isFresh
+    client.on 'notice', (msg)->
+      v = "#{msg.severity} #{msg.code}: "+msg.where
+      console.log(v)
+      console.log("msg %j",msg)
+
+pgp = PGPromise(promiseLib: Promise, query: logFunc, connect: connectFunc)
 
 ## Support functions ##
 
@@ -89,6 +96,18 @@ module.exports = (opts)->
     p = f.properties
     p.snap_types ?= null
     p.snap_width ?= 2*map_width
+
+    if p.snap_types? and p.snap_types.length == 1
+      try
+        {topology} = await db.one sql['get-topology'], {id: p.snap_types[0]}
+        console.log topology
+        if topology?
+          vals = await db.query sql['topology-types'], {topology}
+          p.snap_types = vals.map (d)->d.id
+          console.log "Topological snapping to #{p.snap_types}"
+      catch err
+        console.error err
+        console.error "Couldn't enable topological mapping"
 
     data = {
       geometry: parseGeometry(f)
