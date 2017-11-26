@@ -13,7 +13,14 @@ logFunc = (e)->
   if e.params?
     console.log "    "+e.params
 
-pgp = PGPromise(promiseLib: Promise, query: logFunc)
+connectFunc = (client, dc, isFresh)->
+  if isFresh
+    client.on 'notice', (msg)->
+      v = "#{msg.severity} #{msg.code}: "+msg.where
+      console.log(v)
+      console.log("msg %j",msg)
+
+pgp = PGPromise(promiseLib: Promise, query: logFunc, connect: connectFunc)
 
 ## Support functions ##
 
