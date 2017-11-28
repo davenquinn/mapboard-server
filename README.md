@@ -5,3 +5,8 @@ digitizing mapping data.
 
 This allows you to store your data in a PostGIS database and edit it with a slick digitizing stylus.
 
+## Setup
+
+1. Run `yarn` in the root directory to get the requisite node modules
+2. Run the `create-tables` command.
+3. Run the server with the `run-server` command.

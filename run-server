@@ -4,10 +4,10 @@
 
 dn=${0:a:h}
 
-# Currently we serve tiles and features on two different ports but this is annoying for the long term
-$dn/node_modules/.bin/tessera --require tilelive-mapnik --port 3005 --config $1 & PIDTILES=$!
-shift
+#$dn/node_modules/.bin/tessera --require tilelive-mapnik --port 3005 --config $1 & PIDTILES=$!
+#shift
+#wait $PIDTILES
+# port is unconfigurable 3006 at the moment
 coffee $dn/index.coffee $@ & PIDSERVER=$!
 
-wait $PIDTILES
 wait $PIDSERVER
