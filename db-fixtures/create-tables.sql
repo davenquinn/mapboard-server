@@ -1,10 +1,13 @@
+/*
+This table representation serves as a minimal interface that must
+be implemented for a schema's compatibility with the Map-Digitizer server.
+*/
 CREATE SCHEMA ${schema~};
 
 CREATE TABLE ${schema~}.linework_type (
     id text PRIMARY KEY,
     name text,
     color text,
-    bedrock boolean DEFAULT false
 );
 
 CREATE TABLE ${schema~}.linework (
@@ -23,11 +26,20 @@ CREATE TABLE ${schema~}.linework (
 );
 CREATE INDEX ${schema^}_linework_geometry_idx ON ${schema~}.linework USING gist (geometry);
 
+/*
+Table to define feature types for polygon mode
+
+It is typical usage to manually replace this table
+with a view that refers to features from another table
+(e.g. map units from a more broadly-defined table representation)
+
+Other columns can also be added to this table as appropriate
+*/
+
 CREATE TABLE ${schema~}.polygon_type (
     id text PRIMARY KEY,
     name text,
     color text,
-    bedrock boolean DEFAULT false
 );
 
 CREATE TABLE ${schema~}.polygon (
