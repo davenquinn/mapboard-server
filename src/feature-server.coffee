@@ -1,17 +1,18 @@
 express = require 'express'
 bodyParser = require 'body-parser'
 Promise = require 'bluebird'
-PGPromise = require('pg-promise')
+PGPromise = require 'pg-promise'
 path = require 'path'
 wkx = require 'wkx'
 {Buffer} = require 'buffer'
 {readdirSync} = require 'fs'
 colors = require 'colors'
+tileServer = require './tile-server'
 
 logFunc = (e)->
-  console.log e.query
+  console.log colors.grey(e.query)
   if e.params?
-    console.log "    "+e.params
+    console.log "    "+colors.cyan(e.params)
 
 connectFunc = (client, dc, isFresh)->
   if isFresh
@@ -68,7 +69,8 @@ module.exports = (opts)->
   opts.schema ?= 'map_digitizer'
 
   if tiles?
-    console.log tiles
+    console.log "Serving tiles using config".green, tiles
+    tileServer(tiles)
 
   ## Prepare SQL queries
   dn = path.join __dirname, '..', '/sql'
@@ -79,7 +81,7 @@ module.exports = (opts)->
     sql[key] = pgp.QueryFile _, minify: true, debug: true, params: {schema}
 
   db.query sql['snap-function']
-    .then -> console.log "SQL functions are set up!!!"
+    .then -> console.log "SQL functions are set up!!!".green
 
   app.post "/line/features-in-area", (req, res)->
     env = req.body.envelope
