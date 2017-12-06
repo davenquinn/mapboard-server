@@ -6,7 +6,7 @@
   "bin": "lib/index.js",
   "scripts": {
     "start": "coffee src",
-    "compile": "coffee -o lib -b -c src/*.coffee; pkg . --target node8-macos-x64 --output dist/map-digitizer-server"
+    "compile": "./compile"
   },
   "dependencies": {
     "@mapbox/mbtiles": "^0.9.0",
@@ -21,13 +21,9 @@
     "morgan": "^1.9.0",
     "pg-promise": "^5.6.4",
     "response-time": "^2.3.2",
-    "tessera": "^0.11.2",
+    "tessera": "git://github.com/davenquinn/tessera.git#master",
     "tilelive-cache": "^0.7.1",
     "tilelive-modules": "^0.4.0",
     "wkx": "^0.4.1",
-    "yargs": "^8.0.2"
-  },
-  "pkg": {
-    "assets": "sql/**/*.sql"
-  }
-}
+    "yargs": "^8.0.2" }, "pkg": { "assets":
+    [ "sql/**/*.sql","node_modules/@mapbox/mbtiles/lib/**/*.*" ] } }
