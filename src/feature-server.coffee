@@ -61,7 +61,7 @@ module.exports = (opts)->
   opts.schema ?= 'map_digitizer'
 
   ## Prepare SQL queries
-  dn = path.join __dirname,'sql'
+  dn = path.join __dirname, '..', '/sql'
   sql = {}
   for fn in readdirSync(dn)
     key = path.basename(fn,'.sql')
