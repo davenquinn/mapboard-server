@@ -8,6 +8,11 @@
     type: 'integer'
     default: 4326
     }
+  .option 'port', {
+    describe: "Port on which to serve",
+    type: 'integer',
+    default: 3006
+  }
   .option 'tiles', {
     describe: "A tilelive config URL (or JSON file)
                to define a tile source. All URLs will
@@ -28,11 +33,11 @@ if argv._.length != 1
 
 ## Set up options
 dbname = argv._[0]
-{tiles, schema, srid} = argv
+{tiles, schema, srid, port} = argv
 
 if tiles? and tiles.endsWith ".json"
   # Parse tile config if it's a JSON file
   tiles = JSON.parse readFileSync(tiles, 'utf-8')
 
-module.exports = {dbname, srid, schema, tiles}
+module.exports = {dbname, srid, schema, tiles, port}
 

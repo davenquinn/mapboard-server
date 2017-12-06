@@ -70,7 +70,7 @@ module.exports = (opts)->
 
   if tiles?
     console.log "Serving tiles using config".green, tiles
-    tileServer(tiles)
+    app.use "/tiles", tileServer(tiles)
 
   ## Prepare SQL queries
   dn = path.join __dirname, '..', '/sql'
