@@ -5,6 +5,7 @@
   "license": "MIT",
   "bin": "lib/index.js",
   "scripts": {
+    "start": "coffee src",
     "compile": "coffee -o lib -b -c src/*.coffee; pkg . --target node8-macos-x64 --output dist/map-digitizer-server"
   },
   "dependencies": {
