@@ -60,12 +60,15 @@ send = (res)->
     res.send(data)
 
 module.exports = (opts)->
-  {dbname, schema} = opts
+  {dbname, schema, tiles} = opts
   db = pgp "postgres:///#{dbname}"
   app = express()
   app.use bodyParser.json()
 
   opts.schema ?= 'map_digitizer'
+
+  if tiles?
+    console.log tiles
 
   ## Prepare SQL queries
   dn = path.join __dirname, '..', '/sql'

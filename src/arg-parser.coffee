@@ -1,3 +1,5 @@
+{existsSync, readFileSync} = require 'fs'
+
 {argv} = require 'yargs'
   .usage '$0 [--schema \"schema\"] [--tiles \"tilelive-config\"] [--srid 4326 ] dbname'
   .option 'srid', {
@@ -7,7 +9,9 @@
     default: 4326
     }
   .option 'tiles', {
-    describe: "A tilelive config URL to define a tile source"
+    describe: "A tilelive config URL (or JSON file)
+               to define a tile source. All URLs will
+               be rewritten and mounted at tiles/"
     type: 'string'
     }
   .option 'schema', {
@@ -24,9 +28,11 @@ if argv._.length != 1
 
 ## Set up options
 dbname = argv._[0]
-srid = argv.srid # Use WGS84 lat/lon by default
-schema = argv.schema
-tiles = argv.tiles
+{tiles, schema, srid} = argv
+
+if tiles? and tiles.endsWith ".json"
+  # Parse tile config if it's a JSON file
+  tiles = JSON.parse readFileSync(tiles, 'utf-8')
 
 module.exports = {dbname, srid, schema, tiles}
 

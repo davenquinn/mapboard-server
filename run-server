@@ -1,13 +1,7 @@
 #!/usr/bin/env zsh
-# Usage: run-server <tile-config.json> <opts> <database>
+# Usage: run-server <opts> <database>
 # Order is enforced
 
 dn=${0:a:h}
 
-#$dn/node_modules/.bin/tessera --require tilelive-mapnik --port 3005 --config $1 & PIDTILES=$!
-#shift
-#wait $PIDTILES
-# port is unconfigurable 3006 at the moment
-coffee $dn/index.coffee $@ & PIDSERVER=$!
-
-wait $PIDSERVER
+coffee $dn/src/index.coffee $@
