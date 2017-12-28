@@ -5,7 +5,7 @@
   "license": "MIT",
   "bin": "lib/index.js",
   "scripts": {
-    "start": "coffee src",
+    "prepublish": "coffee -o lib -b -c src/*.coffee",
     "compile": "./compile"
   },
   "dependencies": {
