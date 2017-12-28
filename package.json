@@ -1,7 +1,7 @@
 {
   "name": "map-digitizer-server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/index.coffee",
   "license": "MIT",
   "bin": "lib/index.js",
   "scripts": {
@@ -25,5 +25,9 @@
     "tilelive-cache": "^0.7.1",
     "tilelive-modules": "^0.4.0",
     "wkx": "^0.4.1",
-    "yargs": "^8.0.2" }, "pkg": { "assets":
-    [ "sql/**/*.sql","node_modules/@mapbox/mbtiles/lib/**/*.*" ] } }
+    "yargs": "^8.0.2"
+  },
+  "pkg": {
+    "assets": [ "sql/**/*.sql","node_modules/@mapbox/mbtiles/lib/**/*.*" ]
+  }
+}
