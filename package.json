@@ -1,9 +1,9 @@
 {
   "name": "map-digitizer-server",
   "version": "1.0.0",
-  "main": "src/index.coffee",
+  "main": "src/index.js",
   "license": "MIT",
-  "bin": "lib/index.js",
+  "bin": "src/cli.js",
   "scripts": {
     "prepublish": "coffee -o lib -b -c src/*.coffee",
     "compile": "./compile"

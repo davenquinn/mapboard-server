@@ -1,5 +1,6 @@
 #!/bin/bash
 
+mkdir -p dist
 npm run prepublish
 pkg . --target node8-macos-x64 --output dist/map-digitizer-server
 # Kind of a hack. We have to keep this with our executable
