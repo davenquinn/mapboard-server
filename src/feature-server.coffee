@@ -62,9 +62,10 @@ send = (res)->
 
 module.exports = (opts)->
   # Can pass in dbname or db object
-  {dbname, schema, tiles, db} = opts
-  if not db?
-    db = pgp "postgres:///#{dbname}"
+  {dbname, schema, tiles, connection} = opts
+  if not connection?
+    connection = "postgres:///#{dbname}"
+  db = pgp(connection)
 
   app = express()
   app.use bodyParser.json()
