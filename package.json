@@ -28,6 +28,9 @@
     "yargs": "^8.0.2"
   },
   "pkg": {
-    "assets": [ "sql/**/*.sql","node_modules/@mapbox/mbtiles/lib/**/*.*" ]
+    "assets": [
+      "sql/**/*.sql",
+      "node_modules/@mapbox/mbtiles/lib/**/*.*"
+    ]
   }
 }
