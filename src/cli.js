@@ -1,5 +1,5 @@
 require("coffeescript/register");
-var argsParser = require('./arg-parser');
+var argParser = require('./arg-parser');
 var appFactory = require('./feature-server');
 
 var args = argParser();
