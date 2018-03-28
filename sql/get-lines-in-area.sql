@@ -10,7 +10,8 @@ FROM
 JOIN ${schema~}.linework_type t
   ON l.type = t.id
 WHERE geometry && ST_Transform(
-  ST_MakeEnvelope($1, $2, $3, $4, 4326),
-  (SELECT ST_SRID(geometry) FROM ${schema~}.linework LIMIT 1))
+    ST_MakeEnvelope($1, $2, $3, $4, 4326),
+    ${schema~}.Linework_SRID()
+  )
   AND NOT l.hidden
 

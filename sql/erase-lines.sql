@@ -1,7 +1,8 @@
 WITH eraser AS (
-SELECT ST_Transform(
-  ST_SetSRID(${geometry}::geometry, 4326),
-  (SELECT ST_SRID(geometry) FROM ${schema~}.linework LIMIT 1)) AS geom
+  SELECT ST_Transform(
+    ST_SetSRID(${geometry}::geometry, 4326),
+    ${schema~}.Linework_SRID()
+  ) AS geom
 ),
 features AS (
 SELECT
