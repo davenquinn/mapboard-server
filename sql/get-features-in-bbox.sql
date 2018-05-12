@@ -6,8 +6,8 @@ SELECT
   certainty,
   coalesce(color, '#888888') color
 FROM
-  ${schema~}.linework l
-JOIN ${schema~}.linework_type t
+  ${schema~}.${table~} l
+JOIN ${schema~}.${type_table~} t
   ON l.type = t.id
 WHERE geometry && ST_Transform(
   ST_MakeEnvelope($1, $2, $3, $4, 4326),

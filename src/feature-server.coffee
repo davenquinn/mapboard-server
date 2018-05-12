@@ -92,7 +92,7 @@ module.exports = (opts)->
     tables = {table: 'linework', type_table: 'linework_type'}
     console.log req.body, envelope
     if envelope?
-      db.query sql['get-lines-in-area'], envelope
+      db.query sql['get-features-in-bbox'], envelope
         .map serializeFeature
         .then send(res)
       return
@@ -105,7 +105,7 @@ module.exports = (opts)->
     {envelope} = req.body
     tables = {table: 'polygon', type_table: 'polygon_type'}
     if envelope?
-      db.query sql['get-polygons-in-area'], envelope
+      db.query sql['get-features-in-bbox'], envelope
         .map serializeFeature
         .then send(res)
       return
