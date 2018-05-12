@@ -88,16 +88,32 @@ module.exports = (opts)->
     .then -> console.log "SQL functions are set up!!!".green
 
   app.post "/line/features-in-area", (req, res)->
-    env = req.body.envelope
-    db.query sql['get-lines-in-area'], env
+    {envelope} = req.body
+    tables = {table: 'linework', type_table: 'linework_type'}
+    console.log req.body, envelope
+    if envelope?
+      db.query sql['get-lines-in-area'], envelope
+        .map serializeFeature
+        .then send(res)
+      return
+    geometry = parseGeometry(req.body)
+    db.query sql['get-features-in-polygon'], {geometry, tables...}
       .map serializeFeature
       .then send(res)
 
   app.post "/polygon/features-in-area", (req, res)->
-    env = req.body.envelope
-    db.query sql['get-polygons-in-area'], env
+    {envelope} = req.body
+    tables = {table: 'polygon', type_table: 'polygon_type'}
+    if envelope?
+      db.query sql['get-polygons-in-area'], envelope
+        .map serializeFeature
+        .then send(res)
+      return
+    geometry = parseGeometry(req.body)
+    db.query sql['get-features-in-polygon'], {geometry, tables...}
       .map serializeFeature
       .then send(res)
+
 
   # Set up routes
   app.post "/line/new",(req, res)->
