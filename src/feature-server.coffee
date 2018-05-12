@@ -174,6 +174,16 @@ module.exports = (opts)->
     db.query sql['delete-polygon'], id: req.body.id
       .then send(res)
 
+  app.post "/line/change-type", (req, res)->
+    {features, type} = req.body
+    db.query sql['change-type'], {features, type, table: 'linework'}
+      .then send(res)
+
+  app.post "/polygon/change-type", (req, res)->
+    {features, type} = req.body
+    db.query sql['change-type'], {features, type, table: 'polygon'}
+      .then send(res)
+
   erase = (procName)->(req, res)->
     # Erase features given a geojson polygon
     # Returns a list of replaced features

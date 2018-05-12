@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "license": "MIT",
-  "bin": "src/cli.js",
+  "bin": "lib/cli.js",
   "scripts": {
     "prepublish": "coffee -o lib -b -c src/*.coffee",
     "compile": "./compile"
@@ -28,6 +28,9 @@
     "yargs": "^8.0.2"
   },
   "pkg": {
-    "assets": [ "sql/**/*.sql","node_modules/@mapbox/mbtiles/lib/**/*.*" ]
+    "assets": [
+      "sql/**/*.sql",
+      "node_modules/@mapbox/mbtiles/lib/**/*.*"
+    ]
   }
 }

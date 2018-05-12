@@ -7,7 +7,7 @@ VALUES (
       Linework_SnapEndpoints(
         ST_Transform(
           ST_SetSRID(${geometry}::geometry, 4326),
-          (SELECT ST_SRID(geometry) FROM ${schema~}.linework LIMIT 1)
+          ${schema~}.Linework_SRID()
         ),
         ${snap_width},
         ${snap_types}::text[]

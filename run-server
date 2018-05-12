@@ -4,4 +4,4 @@
 
 dn=${0:a:h}
 
-coffee $dn/src/index.coffee $@
+node $dn/src/cli.js $@
