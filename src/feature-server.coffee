@@ -87,10 +87,9 @@ module.exports = (opts)->
   db.query sql['snap-function']
     .then -> console.log "SQL functions are set up!!!".green
 
-  app.post "/line/features-in-area", (req, res)->
+  featuresInArea = (table)->(req, res)->
     {envelope} = req.body
-    tables = {table: 'linework', type_table: 'linework_type'}
-    console.log req.body, envelope
+    tables = {table, type_table: table+'_type'}
     if envelope?
       db.query sql['get-features-in-bbox'], envelope
         .map serializeFeature
@@ -101,19 +100,8 @@ module.exports = (opts)->
       .map serializeFeature
       .then send(res)
 
-  app.post "/polygon/features-in-area", (req, res)->
-    {envelope} = req.body
-    tables = {table: 'polygon', type_table: 'polygon_type'}
-    if envelope?
-      db.query sql['get-features-in-bbox'], envelope
-        .map serializeFeature
-        .then send(res)
-      return
-    geometry = parseGeometry(req.body)
-    db.query sql['get-features-in-polygon'], {geometry, tables...}
-      .map serializeFeature
-      .then send(res)
-
+  app.post "/line/features-in-area", featuresInArea('linework')
+  app.post "/polygon/features-in-area", featuresInArea('polygon')
 
   # Set up routes
   app.post "/line/new",(req, res)->
@@ -166,23 +154,21 @@ module.exports = (opts)->
     Promise.resolve(newRes)
       .then send(res)
 
-  app.post "/line/delete", (req, res)->
-    db.query sql['delete-line'], id: req.body.id
+  deleteFeatures = (table)->(req, res)->
+    {features} = req.body
+    db.query sql['delete-features'], {table, features}
       .then send(res)
 
-  app.post "/polygon/delete", (req, res)->
-    db.query sql['delete-polygon'], id: req.body.id
-      .then send(res)
-
-  app.post "/line/change-type", (req, res)->
+  changeType = (table)->(req, res)->
     {features, type} = req.body
-    db.query sql['change-type'], {features, type, table: 'linework'}
+    db.query sql['change-type'], {features, type, table}
       .then send(res)
 
-  app.post "/polygon/change-type", (req, res)->
-    {features, type} = req.body
-    db.query sql['change-type'], {features, type, table: 'polygon'}
-      .then send(res)
+  app.post "/line/delete", deleteFeatures('linework')
+  app.post "/polygon/delete", deleteFeatures('polygon')
+
+  app.post "/line/change-type", changeType('linework')
+  app.post "/polygon/change-type", changeType('polygon')
 
   erase = (procName)->(req, res)->
     # Erase features given a geojson polygon
@@ -200,13 +186,18 @@ module.exports = (opts)->
   app.post "/line/erase", erase("lines")
   app.post "/polygon/erase", erase("polygons")
 
-  app.get "/line/types", (req, res)->
-    db.query sql['get-feature-types'], {table: 'linework_type'}
+  app.post "/line/heal", (req, res)->
+    {features, type, tolerance} = req.body
+    db.query sql['heal-lines'], {features, type, tolerance}
+      .map serializeFeature
       .then send(res)
 
-  app.get "/polygon/types", (req, res)->
-    db.query sql['get-feature-types'], {table: 'polygon_type'}
+  types = (table)->(req, res)->
+    db.query sql['get-feature-types'], {table: table+'_type'}
       .then send(res)
+
+  app.get "/line/types", types('linework')
+  app.get "/polygon/types", types('polygon')
 
   return app
 

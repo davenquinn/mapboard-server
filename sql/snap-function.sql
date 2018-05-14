@@ -65,3 +65,13 @@ WHERE f_table_schema = ${schema}
   AND f_geometry_column = 'geometry'
 $$ LANGUAGE SQL IMMUTABLE;
 
+CREATE OR REPLACE FUNCTION ${schema~}.endpoint_intersections(geom geometry)
+RETURNS bigint[]
+AS
+$$
+SELECT ARRAY[
+  (SELECT count(*)-1 FROM ${schema~}.linework l WHERE ST_Intersects(l.geometry, ST_StartPoint(ST_LineMerge(geom)))),
+  (SELECT count(*)-1 FROM ${schema~}.linework l WHERE ST_Intersects(l.geometry, ST_EndPoint(ST_LineMerge(geom))))
+];
+$$ LANGUAGE SQL IMMUTABLE;
+
