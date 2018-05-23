@@ -188,6 +188,7 @@ module.exports = (opts)->
 
   app.post "/line/heal", (req, res)->
     {features, type, tolerance} = req.body
+    tolerance ?= 0 # Don't expect tolerance to be supported
     db.query sql['heal-lines'], {features, type, tolerance}
       .map serializeFeature
       .then send(res)

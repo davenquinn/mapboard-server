@@ -13,7 +13,7 @@ del_initial AS (
 ),
 merged_lines AS (
   SELECT (ST_Dump(ST_LineMerge(ST_Union(geometry)))).geom geometry
-  FROM ${schema~}.linework l
+  FROM candidate_lines l
   GROUP BY l.type
 ),
 merged_lines2 AS (
@@ -61,9 +61,9 @@ LEFT JOIN lines4 l2
   ON ST_Contains(l2.geometry, l1.geometry)
  AND NOT ST_Equals(l1.geometry, l2.geometry)
 ),
-del AS (
+deleted AS (
 -- Same signature as eraser
-DELETE FROM ${schema~}.linework
+DELETE FROM ${schema~}.linework l
 WHERE id IN (SELECT id FROM lines5 UNION SELECT id FROM del_initial)
 RETURNING
   l.id,
@@ -74,10 +74,10 @@ RETURNING
   l.certainty,
   true AS erased
 ),
-ins AS (
+updated AS (
 INSERT INTO ${schema~}.linework (geometry, type, map_width, certainty)
 SELECT
-  ST_Multi(l.geometry),
+  ST_Multi(l.geometry) geometry,
   c.type,
   sum(c.map_width*ST_Length(c.geometry)/ST_Length(l.geometry)) map_width, -- length-weighted average
   round(sum(c.certainty*ST_Length(c.geometry)/ST_Length(l.geometry)))::integer certainty
@@ -86,12 +86,12 @@ JOIN candidate_lines c
   ON c.id = l.id
 GROUP BY (l.geometry, c.type)
 RETURNING
-  l.id,
-  ST_Transform(l.geometry, 4326) geometry,
-  l.type,
-  l.pixel_width,
-  l.map_width,
-  l.certainty,
+  id,
+  ST_Transform(geometry, 4326) geometry,
+  type,
+  (null::numeric) AS pixel_width,
+  map_width,
+  certainty,
   false AS erased
 ),
 results AS (
