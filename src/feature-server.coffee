@@ -91,6 +91,7 @@ module.exports = (opts)->
     {envelope} = req.body
     tables = {table, type_table: table+'_type'}
     if envelope?
+      # Takes care of older cases
       db.query sql['get-features-in-bbox'], envelope
         .map serializeFeature
         .then send(res)
@@ -102,6 +103,17 @@ module.exports = (opts)->
 
   app.post "/line/features-in-area", featuresInArea('linework')
   app.post "/polygon/features-in-area", featuresInArea('polygon')
+
+  app.post "/polygon/faces-in-area", (req, res)->
+    # This should fail silently or return error if topology doesn't exist
+    geometry = parseGeometry(req.body)
+    tables = {
+      topo_schema: "mapping"
+      table: "map_face"
+    }
+    db.query sql['get-map-faces-in-polygon'], {geometry, tables...}
+      .map serializeFeature
+      .then send(res)
 
   # Set up routes
   app.post "/line/new",(req, res)->
