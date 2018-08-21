@@ -16,9 +16,7 @@ SELECT
   ST_Transform(geometry, 4326) geometry,
   unit_id AS type,
   coalesce(color, '#888888') color
-FROM ${topology_schema~}.${table~} l
-JOIN ${topology_schema~}.${type_table~} t
-  ON l.type = t.id
+FROM ${topo_schema~}.${table~} l
 WHERE geometry && (SELECT bounds FROM f)
   AND ST_Intersects(geometry, (SELECT bounds FROM f))
 
