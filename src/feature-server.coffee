@@ -84,9 +84,6 @@ module.exports = (opts)->
     _ = path.join(dn,fn)
     sql[key] = pgp.QueryFile _, minify: true, debug: true, params: {schema}
 
-  db.query sql['snap-function']
-    .then -> console.log "SQL functions are set up!!!".green
-
   featuresInArea = (table)->(req, res)->
     {envelope} = req.body
     tables = {table, type_table: table+'_type'}
@@ -213,4 +210,3 @@ module.exports = (opts)->
   app.get "/polygon/types", types('polygon')
 
   return app
-
