@@ -21,7 +21,7 @@ connectFunc = (client, dc, isFresh)->
       console.log(v)
       console.log("msg %j",msg)
 
-pgp = PGPromise(promiseLib: Promise, query: logFunc, connect: connectFunc)
+pgp = PGPromise({promiseLib: Promise, query: logFunc, connect: connectFunc})
 
 ## Support functions ##
 

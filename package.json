@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "license": "MIT",
-  "bin": "lib/cli.js",
+  "bin": "src/cli.js",
   "scripts": {
     "prepublish": "coffee -o lib -b -c src/*.coffee",
     "compile": "./compile"
