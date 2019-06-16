@@ -141,6 +141,7 @@ module.exports = (opts)->
       .map serializeFeature
       .tap console.log
       .then send(res)
+      .catch console.error
 
   # Set up routes
   app.post "/polygon/new",(req, res)->
@@ -162,6 +163,7 @@ module.exports = (opts)->
     # If we don't want overlap
     Promise.resolve(newRes)
       .then send(res)
+      .catch console.error
 
   deleteFeatures = (table)->(req, res)->
     {features} = req.body

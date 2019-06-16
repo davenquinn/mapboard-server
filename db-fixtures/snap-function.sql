@@ -27,7 +27,7 @@ LOOP
   SELECT
     ST_ClosestPoint(ST_Intersection(l.geometry, buffer), point)
   INTO closestPoint
-  FROM ${schema~}.linework l
+  FROM ${data_schema~}.linework l
   WHERE ST_Intersects(l.geometry, buffer)
     AND NOT l.hidden
     AND coalesce((l.type = ANY(types)), true);
@@ -47,31 +47,30 @@ END;
 $$
 LANGUAGE 'plpgsql' IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION ${schema~}.Linework_SRID()
+CREATE OR REPLACE FUNCTION ${data_schema~}.Linework_SRID()
 RETURNS integer AS
 $$
 SELECT srid FROM geometry_columns
-WHERE f_table_schema = ${schema}
+WHERE f_table_schema = ${data_schema}
   AND f_table_name = 'linework'
   AND f_geometry_column = 'geometry'
 $$ LANGUAGE SQL IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION ${schema~}.Polygon_SRID()
+CREATE OR REPLACE FUNCTION ${data_schema~}.Polygon_SRID()
 RETURNS integer AS
 $$
 SELECT srid FROM geometry_columns
-WHERE f_table_schema = ${schema}
+WHERE f_table_schema = ${data_schema}
   AND f_table_name = 'polygon'
   AND f_geometry_column = 'geometry'
 $$ LANGUAGE SQL IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION ${schema~}.endpoint_intersections(geom geometry)
+CREATE OR REPLACE FUNCTION ${data_schema~}.endpoint_intersections(geom geometry)
 RETURNS bigint[]
 AS
 $$
 SELECT ARRAY[
-  (SELECT count(*)-1 FROM ${schema~}.linework l WHERE ST_Intersects(l.geometry, ST_StartPoint(ST_LineMerge(geom)))),
-  (SELECT count(*)-1 FROM ${schema~}.linework l WHERE ST_Intersects(l.geometry, ST_EndPoint(ST_LineMerge(geom))))
+  (SELECT count(*)-1 FROM ${data_schema~}.linework l WHERE ST_Intersects(l.geometry, ST_StartPoint(ST_LineMerge(geom)))),
+  (SELECT count(*)-1 FROM ${data_schema~}.linework l WHERE ST_Intersects(l.geometry, ST_EndPoint(ST_LineMerge(geom))))
 ];
 $$ LANGUAGE SQL IMMUTABLE;
-
