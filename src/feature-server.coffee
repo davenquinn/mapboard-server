@@ -116,6 +116,7 @@ module.exports = (opts)->
   app.post "/line/new",(req, res)->
     f = req.body
     p = f.properties
+    # This should likely be handled better by the backend
     p.snap_types ?= null
     p.snap_width ?= 2*map_width
 

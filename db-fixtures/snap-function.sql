@@ -13,7 +13,11 @@ res geometry;
 ix int;
 
 BEGIN
- -- DO for both start and endpoints
+
+-- Make sure we aren't dealing with multipolygons
+geom := ST_LineMerge(geom);
+
+-- DO for both start and endpoints
 FOREACH ix IN ARRAY ARRAY[0,-1]
 LOOP
   IF ix = 0 THEN
@@ -36,7 +40,11 @@ LOOP
   IF closestPoint IS NOT null THEN
     buffer := ST_Buffer(closestPoint, width);
     geom := ST_Difference(geom, buffer);
-    geom := ST_AddPoint(geom, closestPoint, ix);
+    IF ix = -1 THEN
+      geom := ST_AddPoint(geom, closestPoint);
+    ELSE
+      geom := ST_AddPoint(geom, closestPoint, 0);
+    END IF;
   END IF;
 
 END LOOP;

@@ -37,4 +37,3 @@ SELECT
 FROM newline l
 JOIN ${schema~}.linework_type t
   ON l.type = t.id
-
