@@ -1,7 +1,7 @@
 WITH f AS (
 SELECT ST_Transform(
   ST_SetSRID(${geometry}::geometry, 4326),
-  (SELECT ST_SRID(geometry) FROM ${schema~}.polygon LIMIT 1)
+  ${schema~}.Polygon_SRID()
 ) AS bounds
 )
 SELECT
