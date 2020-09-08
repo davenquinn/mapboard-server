@@ -1,0 +1,13 @@
+#!/bin/bash -e
+# This startup script should probably be integrated into the application itself
+dbname="mapboard"
+
+while ! $(psql -h db -p 5432 -U postgres "$dbname" > /dev/null 2>&1) ; do
+  echo "Waiting for database..."
+  sleep 1
+done
+
+conn="postgresql://postgres@db/$dbname"
+
+node_modules/.bin/coffee ./create-tables --srid "${MAPBOARD_SRID:-4326}" "$conn"
+node ./src/cli.js "$conn"
