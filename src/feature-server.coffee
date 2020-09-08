@@ -63,6 +63,9 @@ send = (res)->
 module.exports = (opts)->
   # Can pass in dbname or db object
   {dbname, schema, tiles, connection} = opts
+  if dbname? and dbname.startsWith("postgres://")
+    connection = dbname
+
   if not connection?
     connection = "postgres:///#{dbname}"
   db = pgp(connection)
@@ -199,6 +202,7 @@ module.exports = (opts)->
   app.post "/polygon/erase", erase("polygons")
 
   app.post "/line/heal", (req, res)->
+    ### Line healing is not yet supported by the Mapboard GIS app ###
     {features, type, tolerance} = req.body
     tolerance ?= 0 # Don't expect tolerance to be supported
     db.query sql['heal-lines'], {features, type, tolerance}

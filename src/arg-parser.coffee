@@ -29,7 +29,7 @@ module.exports = ->
     .alias 'h','help'
 
   if argv._.length != 1
-    console.error "Must specify a database"
+    console.error "Must specify a database name or connection"
     process.exit()
 
   ## Set up options
@@ -41,4 +41,3 @@ module.exports = ->
     tiles = JSON.parse readFileSync(tiles, 'utf-8')
 
   return {dbname, srid, schema, tiles, port}
-

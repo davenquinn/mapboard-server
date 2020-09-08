@@ -1,13 +1,13 @@
 /*
 This table representation serves as a minimal interface that must
-be implemented for a schema's compatibility with the Map-Digitizer server.
+be implemented for a schema's compatibility with the Mapboard server.
 */
 CREATE SCHEMA ${schema~};
 
 CREATE TABLE ${schema~}.linework_type (
     id text PRIMARY KEY,
     name text,
-    color text,
+    color text
 );
 
 CREATE TABLE ${schema~}.linework (
@@ -39,7 +39,7 @@ Other columns can also be added to this table as appropriate
 CREATE TABLE ${schema~}.polygon_type (
     id text PRIMARY KEY,
     name text,
-    color text,
+    color text
 );
 
 CREATE TABLE ${schema~}.polygon (
