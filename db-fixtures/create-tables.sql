@@ -49,6 +49,8 @@ CREATE TABLE ${schema~}.polygon (
   created       timestamp without time zone DEFAULT now(),
   certainty     integer,
   zoom_level    integer,
+  pixel_width   numeric,
+  map_width     numeric,
   hidden        boolean DEFAULT false,
   source        text,
   name          text,

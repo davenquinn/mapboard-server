@@ -1,5 +1,7 @@
 #!/usr/bin/env coffee
 _ = require 'pg-promise'
+glob = require "glob"
+
 query = (e)->console.log e.query
 pgp = _ {query}
 
@@ -20,8 +22,17 @@ if not connection?
 
 db = pgp(connection)
 
-params = {schema, srid}
-procedure = QueryFile "#{__dirname}/db-fixtures/create-tables.sql", {params}
+params = {
+  schema
+  # `data_schema` is for interoperability with PostGIS-Geologic-Map
+  data_schema: schema
+  srid
+}
+
+createFixtures = ->
+  for file in glob.sync("#{__dirname}/db-fixtures/*.sql")
+    sql = QueryFile file, {params}
+    await db.query sql
 
 do ->
   try
@@ -31,7 +42,8 @@ do ->
     console.log("Tables not found, creating...")
 
   try
-    await db.query procedure
+    await createFixtures()
   catch err
     console.error err
+
   process.exit()
