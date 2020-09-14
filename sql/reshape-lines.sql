@@ -7,3 +7,11 @@ Reshaping lines
   - If multiple, choose the shortest line
 4. Replace constituent features with new line
 */
+SELECT
+  (Linework_Reshape(Geom_Transform(${geometry}), ${tolerance}, ${type})).result geometry,
+  id AS type,
+  2 map_width,
+  2 pixel_width,
+  color
+FROM map_digitizer.linework_type
+WHERE id = ${type};
