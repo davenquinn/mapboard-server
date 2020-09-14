@@ -202,13 +202,21 @@ module.exports = (opts)->
   app.post "/polygon/erase", erase("polygons")
 
   app.post "/line/reshape", (req, res)->
-    {geometry, properties} = req.body
-    {type, snap_width} = properties
+    f = req.body
+    {snap_width, rest...} = f.properties
     tolerance = snap_width or 0
 
-    res = await db.one sql['reshape-lines'], {geometry, type, tolerance}
-    val = serializeFeature({geometry: res.result})
-    send(val)
+    data = {
+      geometry: parseGeometry(f)
+      rest...
+      tolerance
+    }
+
+    db.query sql['reshape-lines'], data
+      .map serializeFeature
+      .tap console.log
+      .then send(res)
+      .catch console.error
 
   app.post "/line/heal", (req, res)->
     ### Line healing is not yet supported by the Mapboard GIS app ###

@@ -13,6 +13,12 @@ SELECT ST_Transform(
 )
 $$ LANGUAGE SQL IMMUTABLE;
 
+CREATE OR REPLACE FUNCTION minimum(anyarray)
+RETURNS anyelement as $$
+select min($1[i]) from generate_series(array_lower($1,1),
+array_upper($1,1)) g(i);
+$$ LANGUAGE SQL IMMUTABLE STRICT;
+
 
 CREATE OR REPLACE FUNCTION Linework_Reshape(
   blade geometry,
@@ -25,12 +31,19 @@ DECLARE
 subject geometry;
 intersection geometry;
 n_points integer;
-cut_points geometry;
+start_point geometry;
+end_point geometry;
+subj_distances numeric[];
+d1 numeric;
+d2 numeric;
+start geometry;
+middle geometry;
+tail geometry;
 out reshape_result;
 BEGIN
 
 -- Get the intersecting linework
-SELECT l.geometry
+SELECT ST_LineMerge(ST_Union(l.geometry))
 INTO subject
 FROM map_digitizer.linework l
 WHERE ST_Intersects(l.geometry, blade)
@@ -44,25 +57,38 @@ WHERE ST_Intersects(l.geometry, blade)
   AND NOT l.hidden
   AND l.type = linework_type;
 
--- Get the intersection of the cutting blade and the relevant linework
-SELECT ST_Intersection(subject, blade)
-INTO intersection;
+-- Get the intersection of the cutting
+-- blade and the relevant linework
+SELECT ST_Intersection(subject, blade) INTO intersection;
 
 n_points := ST_NPoints(intersection);
 
--- intersection := ST_MakeLine(intersection);
-cut_points := ST_Collect(ST_GeometryN(intersection, 1), ST_GeometryN(intersection, n_points));
+start_point := ST_GeometryN(intersection, 1);
+end_point := ST_GeometryN(intersection, n_points);
 
-subject := ST_Split(subject, intersection);
-blade := ST_Split(blade, cut_points);
+-- Apply distancing along subject
+d1 := ST_LineLocatePoint(subject, start_point);
+d2 := ST_LineLocatePoint(subject, end_point);
 
---SELECT ST_GeometryN(intersection, n_points) INTO out.result;
+IF d1 < d2 THEN
+  start := ST_LineSubstring(subject, 0, d1);
+  tail := ST_LineSubstring(subject, d2, 1);
+ELSE
+  start := ST_LineSubstring(subject, 0, d2);
+  tail := ST_LineSubstring(subject, d1, 1);
+END IF;
 
-SELECT ST_LineMerge(ST_Collect(ARRAY[
-    ST_GeometryN(subject,1),
-    ST_GeometryN(blade, 2),
-    ST_GeometryN(subject,3)
-  ])) INTO out.result;
+-- Apply distancing along blade
+d1 := ST_LineLocatePoint(blade, start_point);
+d2 := ST_LineLocatePoint(blade, end_point);
+IF d1 < d2 THEN
+  middle := ST_LineSubstring(blade, d1, d2);
+ELSE
+  middle := ST_LineSubstring(blade, d2, d1);
+END IF;
+
+SELECT ST_Multi(ST_LineMerge(ST_Union(ARRAY[start, middle, tail]::geometry[])))
+INTO out.result;
 
 RETURN out;
 
