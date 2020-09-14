@@ -1,7 +1,8 @@
 DROP TYPE IF EXISTS reshape_result CASCADE;
 CREATE TYPE reshape_result AS (
   result geometry,
-  deleted integer[]
+  deleted integer[],
+  exception text
 );
 
 CREATE OR REPLACE FUNCTION Geom_Transform(geom geometry)
@@ -43,7 +44,7 @@ out reshape_result;
 BEGIN
 
 -- Get the intersecting linework
-SELECT ST_LineMerge(ST_Union(l.geometry))
+SELECT ST_MakeValid(ST_LineMerge(ST_Union(l.geometry)))
 INTO subject
 FROM map_digitizer.linework l
 WHERE ST_Intersects(l.geometry, blade)
@@ -67,8 +68,15 @@ start_point := ST_GeometryN(intersection, 1);
 end_point := ST_GeometryN(intersection, n_points);
 
 -- Apply distancing along subject
-d1 := ST_LineLocatePoint(subject, start_point);
-d2 := ST_LineLocatePoint(subject, end_point);
+BEGIN
+  d1 := ST_LineLocatePoint(subject, start_point);
+  d2 := ST_LineLocatePoint(subject, end_point);
+EXCEPTION WHEN others THEN
+  -- We are in a more complex case where we want to manage multiple points
+  SELECT null INTO out.result;
+  SELECT ARRAY[]::integer[] INTO out.deleted;
+  RETURN out;
+END;
 
 IF d1 < d2 THEN
   start := ST_LineSubstring(subject, 0, d1);
@@ -92,6 +100,10 @@ INTO out.result;
 
 RETURN out;
 
+-- EXCEPTION WHEN others THEN
+--   SELECT null INTO out.result;
+--   SELECT ARRAY[]::integer[] INTO out.deleted;
+--   RETURN out;
 END;
 $$
 LANGUAGE 'plpgsql' IMMUTABLE;

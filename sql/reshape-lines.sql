@@ -22,6 +22,7 @@ new AS (
     ${certainty},
     ${zoom_level}
   FROM res
+  WHERE res.result IS NOT null
   RETURNING
     id,
     geometry,
