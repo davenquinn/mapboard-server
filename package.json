@@ -1,9 +1,11 @@
 {
-  "name": "map-digitizer-server",
-  "version": "1.0.0",
+  "name": "mapboard-server",
+  "version": "2.0.0",
   "main": "src/index.js",
   "license": "MIT",
-  "bin": "src/cli.js",
+  "bin": {
+    "mapboard": "src/cli.js"
+  },
   "scripts": {
     "prepublish": "coffee -o lib -b -c src/*.coffee",
     "compile": "./compile"
@@ -32,5 +34,8 @@
       "sql/**/*.sql",
       "node_modules/@mapbox/mbtiles/lib/**/*.*"
     ]
+  },
+  "devDependencies": {
+    "parcel": "^2.0.0-beta.1"
   }
 }
