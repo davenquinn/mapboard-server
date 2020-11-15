@@ -6,9 +6,20 @@
   "bin": {
     "mapboard": "dist/cli.js"
   },
+  "source": [
+    "src/index.ts",
+    "src/cli.ts"
+  ],
+  "targets": {
+    "main": false,
+    "node": {
+      "context": "node"
+    }
+  },
   "scripts": {
-    "prepublish": "coffee -o lib -b -c src/*.coffee",
-    "build": "parcel build --no-minify --target=node src/index.ts src/cli.ts",
+    "prepublish": "npm run build",
+    "build": "parcel build --no-minify src/index.ts src/cli.ts",
+    "dev": "parcel watch src/index.ts src/cli.ts",
     "compile": "./compile"
   },
   "dependencies": {
@@ -24,7 +35,7 @@
     "morgan": "^1.9.0",
     "pg-promise": "^10.7.3",
     "response-time": "^2.3.2",
-    "tessera": "git://github.com/davenquinn/tessera.git#master",
+    "tessera": "^0.14.1",
     "tilelive-cache": "^0.7.1",
     "tilelive-modules": "^0.4.2",
     "wkx": "^0.4.1",

@@ -4,36 +4,38 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const _ = require('pg-promise');
-const query = e => console.log(e.query);
-const pgp = _({query});
+const _ = require("pg-promise");
+const query = (e) => console.log(e.query);
+const pgp = _({ query });
 
-const argParser = require('./src/arg-parser');
-const {dbname, srid, schema, tiles} = argParser();
+const { argParser } = require("../dist");
+const { dbname, srid, schema, tiles } = argParser();
 
 console.log(dbname, srid, schema);
 
-const {QueryFile} = pgp;
-const {readFileSync} = require('fs');
+const { QueryFile } = pgp;
+const { readFileSync } = require("fs");
 
 let connection = null;
-if ((dbname != null) && dbname.startsWith("postgresql://")) {
+if (dbname != null && dbname.startsWith("postgresql://")) {
   connection = dbname;
 }
 
-if ((connection == null)) {
+if (connection == null) {
   connection = `postgresql:///${dbname}`;
 }
 
 const db = pgp(connection);
 
-const params = {schema, srid};
-const procedure = QueryFile(`${__dirname}/db-fixtures/create-tables.sql`, {params});
+const params = { schema, srid };
+const procedure = QueryFile(`${__dirname}/db-fixtures/create-tables.sql`, {
+  params,
+});
 
-(async function() {
+(async function () {
   let err;
   try {
-    await db.query("SELECT count(*) FROM ${schema~}.linework", {schema});
+    await db.query("SELECT count(*) FROM ${schema~}.linework", { schema });
     process.exit();
   } catch (error) {
     err = error;
