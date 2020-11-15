@@ -28,7 +28,7 @@ if (connection == null) {
 const db = pgp(connection);
 
 const params = { schema, srid };
-const procedure = QueryFile(`${__dirname}/db-fixtures/create-tables.sql`, {
+const procedure = new QueryFile(`${__dirname}/db-fixtures/create-tables.sql`, {
   params,
 });
 

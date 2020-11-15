@@ -113,7 +113,7 @@ module.exports = function (opts) {
   for (let fn of Array.from(readdirSync(dn))) {
     const key = path.basename(fn, ".sql");
     const _ = path.join(dn, fn);
-    sql[key] = pgp.QueryFile(_, {
+    sql[key] = new pgp.QueryFile(_, {
       minify: true,
       debug: true,
       params: { schema },
