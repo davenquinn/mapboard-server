@@ -1,12 +1,6 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 import express from "express";
 const bodyParser = require("body-parser");
+const Promise = require("bluebird");
 const PGPromise = require("pg-promise");
 const path = require("path");
 const wkx = require("wkx");
