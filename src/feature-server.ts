@@ -1,5 +1,5 @@
 import express from "express";
-const bodyParser = require("body-parser");
+import bodyParser from "body-parser";
 const Promise = require("bluebird");
 const PGPromise = require("pg-promise");
 const path = require("path");
@@ -79,7 +79,7 @@ const send = (res) =>
     return res.send(data);
   };
 
-module.exports = function (opts) {
+export function featureServer(opts) {
   // Can pass in dbname or db object
   let { dbname, schema, tiles, connection } = opts;
   if (dbname != null && dbname.startsWith("postgres://")) {
@@ -93,6 +93,7 @@ module.exports = function (opts) {
 
   const app = express();
   app.use(bodyParser.json());
+  app.set("db", db);
 
   if (opts.schema == null) {
     opts.schema = "map_digitizer";
@@ -281,4 +282,4 @@ module.exports = function (opts) {
   app.get("/polygon/types", types("polygon"));
 
   return app;
-};
+}
