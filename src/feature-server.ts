@@ -38,12 +38,14 @@ const serializeFeature = function (r) {
   const geometry = new Buffer(r.geometry, "hex").toString("base64");
   const { id, pixel_width, map_width, certainty } = r;
 
+  const type = r.type != null ? r.type.trim() : null;
+
   let feature = {
     type: "Feature",
     geometry,
     id,
     properties: {
-      type: r.type.trim(),
+      type,
       color: r.color.trim(),
       pixel_width,
       map_width,
@@ -135,12 +137,12 @@ module.exports = function (opts) {
   app.post("/line/features-in-area", featuresInArea("linework"));
   app.post("/polygon/features-in-area", featuresInArea("polygon"));
 
-  app.post("/polygon/faces-in-area", function (req, res) {
+  app.post("/topology/features-in-area", function (req, res) {
     // This should fail silently or return error if topology doesn't exist
     const geometry = parseGeometry(req.body);
     const tables = {
-      topo_schema: "mapping",
-      table: "map_face",
+      topo_schema: "map_topology",
+      table: "face_display",
     };
     return db
       .query(sql["get-map-faces-in-polygon"], { geometry, ...tables })
