@@ -281,5 +281,9 @@ export function featureServer(opts) {
   app.get("/line/types", types("linework"));
   app.get("/polygon/types", types("polygon"));
 
+  app.get("/", (req, res) => {
+    res.send("Feature server");
+  });
+
   return app;
 }
