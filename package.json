@@ -37,7 +37,7 @@
     "pg-promise": "^10.7.3",
     "regenerator-runtime": "^0.13.7",
     "response-time": "^2.3.2",
-    "socket.io": "^3.0.1",
+    "socket.io": "^2.3.0",
     "tessera": "^0.14.1",
     "tilelive-cache": "^0.7.1",
     "tilelive-modules": "^0.4.2",
