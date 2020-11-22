@@ -1,10 +1,24 @@
 import "regenerator-runtime/runtime.js";
+import express from "express";
 import { createServer as createServerBase } from "http";
 import { featureServer } from "./feature-server";
 import { topologyWatcher } from "./topology-watcher";
+import html from "url:./socket-log.html";
 
 function appFactory(opts) {
-  const app = featureServer(opts);
+  const features = featureServer(opts);
+
+  var app = express();
+
+  // This is kind of hare-brained
+  app.set("db", features.get("db"));
+
+  app.use("/", features);
+
+  app.get("/socket-test", (req, res) => {
+    res.sendFile(__dirname + html);
+  });
+
   return app;
 }
 
