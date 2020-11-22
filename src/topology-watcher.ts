@@ -11,7 +11,8 @@ export async function topologyWatcher(db, server) {
   conn.client.on("notification", (message) => {
     const data = JSON.parse(message.payload);
     io.emit("topology", data);
-    console.log(`Emitting topology change event: ${data.payload}`);
+    const v = JSON.stringify(data, null, 2);
+    console.log(`Emitting topology change event: ${v}`);
     // The payload isn't used for anything right now...
   });
 
