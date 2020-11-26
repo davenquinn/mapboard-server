@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { buildQueryCache } from "./database";
+import { SQLCache } from "./database";
+import { IDatabase } from "pg-promise";
 import wkx from "wkx";
 import { Buffer } from "buffer";
 
@@ -51,11 +52,14 @@ const send = (res) =>
     return res.send(data);
   };
 
-export default function featureServer(db, opts) {
+export default function featureServer(
+  db: IDatabase<any, any>,
+  queryCache: SQLCache
+) {
   const app = express();
   app.use(bodyParser.json());
 
-  const sql = buildQueryCache(opts);
+  const sql = queryCache;
 
   const featuresInArea = (table) =>
     function (req, res) {

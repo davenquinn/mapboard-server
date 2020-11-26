@@ -4,8 +4,8 @@ import { createServer as createServerBase } from "http";
 import featureServer from "./feature-server";
 import topologyWatcher from "./topology-watcher";
 import tileServer from "./tile-server";
-import metaRoutes from "./meta";
-import database from "./database";
+import metaRoute from "./meta";
+import database, { buildQueryCache } from "./database";
 import html from "url:./socket-log.html";
 
 function appFactory(opts) {
@@ -13,14 +13,21 @@ function appFactory(opts) {
     opts.schema = "map_digitizer";
   }
 
+  if (opts.topology == null) {
+    opts.topology = "map_topology";
+  }
+
   var app = express();
 
   const db = database(opts);
+  const queryCache = buildQueryCache(opts);
+
   // This is kind of hare-brained
   app.set("db", db);
+  app.set("sql", queryCache);
 
-  app.use("/", featureServer(db, opts));
-  metaRoutes(app);
+  app.use("/", featureServer(db, queryCache));
+  app.get("/meta", metaRoute(db, queryCache, opts));
 
   if (opts.tiles != null) {
     console.log("Serving tiles using config".green, opts.tiles);

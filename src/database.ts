@@ -27,7 +27,7 @@ const pgp = PGPromise({
   connect: connectFunc,
 });
 
-type SQLCache = {
+export type SQLCache = {
   [key: string]: PGPromise.QueryFile;
 };
 
