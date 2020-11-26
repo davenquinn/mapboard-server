@@ -112,7 +112,6 @@ export default function featureServer(
         const { topology } = await db.one(sql["get-topology"], {
           id: p.snap_types[0],
         });
-        console.log(topology);
         if (topology != null) {
           const vals = await db.query(sql["topology-types"], { topology });
           p.snap_types = vals.map((d) => d.id);

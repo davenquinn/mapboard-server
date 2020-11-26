@@ -19,6 +19,7 @@ export default function metadataRoute(db, queryCache, opts) {
       version,
       projection,
       topology,
+      backend: "PostGIS",
       capabilities: [
         "basic-editing", // Tools defined in version 1 of the app
         "reshape",
