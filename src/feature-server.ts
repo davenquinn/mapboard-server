@@ -1,36 +1,8 @@
 import express from "express";
 import bodyParser from "body-parser";
-const Promise = require("bluebird");
-const PGPromise = require("pg-promise");
-const path = require("path");
-const wkx = require("wkx");
-const { Buffer } = require("buffer");
-const { readdirSync } = require("fs");
-const colors = require("colors");
-const tileServer = require("./tile-server");
-
-const logFunc = function (e) {
-  console.log(colors.grey(e.query));
-  if (e.params != null) {
-    return console.log("    " + colors.cyan(e.params));
-  }
-};
-
-const connectFunc = function (client, dc, isFresh) {
-  if (isFresh) {
-    return client.on("notice", function (msg) {
-      const v = `${msg.severity} ${msg.code}: ` + msg.where;
-      console.log(v);
-      return console.log("msg %j", msg);
-    });
-  }
-};
-
-const pgp = PGPromise({
-  promiseLib: Promise,
-  query: logFunc,
-  connect: connectFunc,
-});
+import { buildQueryCache } from "./database";
+import wkx from "wkx";
+import { Buffer } from "buffer";
 
 //# Support functions ##
 
@@ -79,43 +51,11 @@ const send = (res) =>
     return res.send(data);
   };
 
-export function featureServer(opts) {
-  // Can pass in dbname or db object
-  let { dbname, schema, tiles, connection } = opts;
-  if (dbname != null && dbname.startsWith("postgres://")) {
-    connection = dbname;
-  }
-
-  if (connection == null) {
-    connection = `postgres:///${dbname}`;
-  }
-  const db = pgp(connection);
-
+export default function featureServer(db, opts) {
   const app = express();
   app.use(bodyParser.json());
-  app.set("db", db);
 
-  if (opts.schema == null) {
-    opts.schema = "map_digitizer";
-  }
-
-  if (tiles != null) {
-    console.log("Serving tiles using config".green, tiles);
-    app.use("/tiles", tileServer(tiles));
-  }
-
-  //# Prepare SQL queries
-  const dn = path.join(__dirname, "..", "/sql");
-  const sql = {};
-  for (let fn of Array.from(readdirSync(dn))) {
-    const key = path.basename(fn, ".sql");
-    const _ = path.join(dn, fn);
-    sql[key] = new pgp.QueryFile(_, {
-      minify: true,
-      debug: true,
-      params: { schema },
-    });
-  }
+  const sql = buildQueryCache(opts);
 
   const featuresInArea = (table) =>
     function (req, res) {

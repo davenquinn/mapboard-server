@@ -13,7 +13,7 @@ require("@mapbox/mbtiles");
 
 // This tile server is based on the tessera server.js code.
 
-const tileServer = function (opts) {
+export default function tileServer(opts) {
   if (typeof opts === "string") {
     opts = { "/": opts };
   }
@@ -40,6 +40,4 @@ const tileServer = function (opts) {
   }
 
   return app;
-};
-
-module.exports = tileServer;
+}

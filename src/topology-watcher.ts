@@ -1,6 +1,6 @@
 import socketIO from "socket.io";
 
-export async function topologyWatcher(db, server, socketOptions = {}) {
+export default async function topologyWatcher(db, server, socketOptions = {}) {
   console.log("Starting topology watcher");
   // Watches for PG events
   const io = socketIO(server, socketOptions);
