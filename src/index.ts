@@ -1,19 +1,38 @@
 import "regenerator-runtime/runtime.js";
 import express from "express";
 import { createServer as createServerBase } from "http";
-import { featureServer } from "./feature-server";
-import { topologyWatcher } from "./topology-watcher";
+import featureServer from "./feature-server";
+import topologyWatcher from "./topology-watcher";
+import tileServer from "./tile-server";
+import metaRoute from "./meta";
+import database, { buildQueryCache } from "./database";
 import html from "url:./socket-log.html";
 
 function appFactory(opts) {
-  const features = featureServer(opts);
+  if (opts.schema == null) {
+    opts.schema = "map_digitizer";
+  }
+
+  if (opts.topology == null) {
+    opts.topology = "map_topology";
+  }
 
   var app = express();
 
-  // This is kind of hare-brained
-  app.set("db", features.get("db"));
+  const db = database(opts);
+  const queryCache = buildQueryCache(opts);
 
-  app.use("/", features);
+  // This is kind of hare-brained
+  app.set("db", db);
+  app.set("sql", queryCache);
+
+  app.use("/", featureServer(db, queryCache));
+  app.get("/meta", metaRoute(db, queryCache, opts));
+
+  if (opts.tiles != null) {
+    console.log("Serving tiles using config".green, opts.tiles);
+    app.use("/tiles", tileServer(opts.tiles));
+  }
 
   app.get("/socket-test", (req, res) => {
     res.sendFile(__dirname + html);
