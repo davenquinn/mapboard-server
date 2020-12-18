@@ -57,7 +57,7 @@ export default function featureServer(
   queryCache: SQLCache
 ) {
   const app = express();
-  app.use(bodyParser.json());
+  app.use(bodyParser.json({limit: '50mb', extended: true}));
 
   const sql = queryCache;
 
