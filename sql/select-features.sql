@@ -8,7 +8,7 @@ SELECT ST_Transform(
 SELECT
   l.id,
   l.type,
-  coalesce(ST_CoveredBy(l.geometry, e.geom), false) is_covered
+  coalesce(ST_CoveredBy(l.geometry, (SELECT bounds FROM f)), false) is_covered
 FROM ${schema~}.${table~} l
 WHERE geometry && (SELECT bounds FROM f)
   AND ST_Intersects(geometry, (SELECT bounds FROM f))
