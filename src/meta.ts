@@ -24,6 +24,7 @@ export default function metadataRoute(db, queryCache, opts) {
         "basic-editing", // Tools defined in version 1 of the app
         "reshape",
         "topology", // This should only be on if available
+        "select-features",
       ],
     });
   };

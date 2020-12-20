@@ -8,7 +8,7 @@ import { Buffer } from "buffer";
 //# Support functions ##
 
 const serializeFeature = function (r) {
-  const geometry = new Buffer(r.geometry, "hex").toString("base64");
+  const geometry = Buffer.from(r.geometry, "hex").toString("base64");
   const { id, pixel_width, map_width, certainty } = r;
 
   const type = r.type != null ? r.type.trim() : null;
@@ -57,7 +57,7 @@ export default function featureServer(
   queryCache: SQLCache
 ) {
   const app = express();
-  app.use(bodyParser.json({limit: '50mb', extended: true}));
+  app.use(bodyParser.json({ limit: "50mb", extended: true }));
 
   const sql = queryCache;
 
@@ -85,15 +85,34 @@ export default function featureServer(
   app.post("/topology/features-in-area", function (req, res) {
     // This should fail silently or return error if topology doesn't exist
     const geometry = parseGeometry(req.body);
-    const tables = {
+    const tableNames = {
       topo_schema: "map_topology",
       table: "face_display",
     };
     return db
-      .query(sql["get-map-faces-in-polygon"], { geometry, ...tables })
+      .query(sql["get-map-faces-in-polygon"], { geometry, ...tableNames })
       .map(serializeFeature)
       .then(send(res));
   });
+
+  // Selection
+
+  const selectFeatures = (table) =>
+    async function (req, res) {
+      console.log(req);
+      const geometry = parseGeometry(req.body);
+      const tables = { table, type_table: table + "_type" };
+      return db
+        .query(sql["select-features"], {
+          geometry,
+          ...tables,
+          types: null,
+        })
+        .then(send(res));
+    };
+
+  app.post("/line/select-features", selectFeatures("linework"));
+  app.post("/polygon/select-features", selectFeatures("polygon"));
 
   // Set up routes
   app.post("/line/new", async function (req, res) {
