@@ -223,12 +223,15 @@ export default function featureServer(
   app.post("/line/erase", erase("lines"));
   app.post("/polygon/erase", erase("polygons"));
 
+  // Line-specific tools
+
   app.post("/line/heal", function (req, res) {
     /* Line healing is not yet supported by the Mapboard GIS app */
     let { features, type, tolerance } = req.body;
     if (tolerance == null) {
       tolerance = 0;
     } // Don't expect tolerance to be supported
+    console.log("Healing lines");
     return db
       .query(sql["heal-lines"], { features, type, tolerance })
       .map(serializeFeature)
