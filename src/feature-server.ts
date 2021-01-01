@@ -1,6 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { SQLCache } from "./database";
+import { SQLCache, pgp } from "./database";
 import { IDatabase } from "pg-promise";
 import wkx from "wkx";
 import { Buffer } from "buffer";
@@ -198,11 +198,28 @@ export default function featureServer(
         .then(send(res));
     };
 
+  const modify = (table) =>
+    function (req, res) {
+      // an open modification route for objects
+      const { features, ...vals } = req.body;
+      const whereClause = pgp.as.format(`
+      WHERE id IN (\${features:csv})
+      RETURNING id`);
+      const sql =
+        pgp.helpers.update(vals, null, { table, schema: "map_digitizer" }) +
+        whereClause;
+
+      return db.query(sql, { features }).tap(console.log).then(send(res));
+    };
+
   app.post("/line/delete", deleteFeatures("linework"));
   app.post("/polygon/delete", deleteFeatures("polygon"));
 
   app.post("/line/change-type", changeType("linework"));
   app.post("/polygon/change-type", changeType("polygon"));
+
+  app.post("/line/modify", modify("linework"));
+  app.post("/polygon/modify", modify("polygon"));
 
   const erase = (procName) =>
     function (req, res) {
