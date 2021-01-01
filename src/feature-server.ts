@@ -231,9 +231,19 @@ export default function featureServer(
     if (tolerance == null) {
       tolerance = 0;
     } // Don't expect tolerance to be supported
+
+    // Should return messages object
     console.log("Healing lines");
     return db
       .query(sql["heal-lines"], { features, type, tolerance })
+      .map(serializeFeature)
+      .then(send(res));
+  });
+
+  app.post("/line/reverse", (req, res) => {
+    const { features, type } = req.body;
+    return db
+      .query(sql["reverse-lines"], { features, type })
       .map(serializeFeature)
       .then(send(res));
   });
