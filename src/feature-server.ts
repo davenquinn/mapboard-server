@@ -209,7 +209,7 @@ export default function featureServer(
         pgp.helpers.update(vals, null, { table, schema: "map_digitizer" }) +
         whereClause;
 
-      return db.query(sql, { features }).tap(console.log).then(send(res));
+      return db.query(sql, { features }).then(send(res));
     };
 
   app.post("/line/delete", deleteFeatures("linework"));
