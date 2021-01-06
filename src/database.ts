@@ -21,7 +21,8 @@ const connectFunc = function (client, dc, isFresh) {
   }
 };
 
-const pgp = PGPromise({
+export const pgp = PGPromise({
+  capSQL: true,
   promiseLib: Bluebird,
   query: logFunc,
   connect: connectFunc,

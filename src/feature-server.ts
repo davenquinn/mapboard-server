@@ -1,6 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { SQLCache } from "./database";
+import { SQLCache, pgp } from "./database";
 import { IDatabase } from "pg-promise";
 import wkx from "wkx";
 import { Buffer } from "buffer";
@@ -8,7 +8,7 @@ import { Buffer } from "buffer";
 //# Support functions ##
 
 const serializeFeature = function (r) {
-  const geometry = new Buffer(r.geometry, "hex").toString("base64");
+  const geometry = Buffer.from(r.geometry, "hex").toString("base64");
   const { id, pixel_width, map_width, certainty } = r;
 
   const type = r.type != null ? r.type.trim() : null;
@@ -57,7 +57,7 @@ export default function featureServer(
   queryCache: SQLCache
 ) {
   const app = express();
-  app.use(bodyParser.json());
+  app.use(bodyParser.json({ limit: "50mb", extended: true }));
 
   const sql = queryCache;
 
@@ -85,15 +85,34 @@ export default function featureServer(
   app.post("/topology/features-in-area", function (req, res) {
     // This should fail silently or return error if topology doesn't exist
     const geometry = parseGeometry(req.body);
-    const tables = {
+    const tableNames = {
       topo_schema: "map_topology",
       table: "face_display",
     };
     return db
-      .query(sql["get-map-faces-in-polygon"], { geometry, ...tables })
+      .query(sql["get-map-faces-in-polygon"], { geometry, ...tableNames })
       .map(serializeFeature)
       .then(send(res));
   });
+
+  // Selection
+
+  const selectFeatures = (table) =>
+    async function (req, res) {
+      console.log(req);
+      const geometry = parseGeometry(req.body);
+      const tables = { table, type_table: table + "_type" };
+      return db
+        .query(sql["select-features"], {
+          geometry,
+          ...tables,
+          types: null,
+        })
+        .then(send(res));
+    };
+
+  app.post("/line/select-features", selectFeatures("linework"));
+  app.post("/polygon/select-features", selectFeatures("polygon"));
 
   // Set up routes
   app.post("/line/new", async function (req, res) {
@@ -179,11 +198,28 @@ export default function featureServer(
         .then(send(res));
     };
 
+  const modify = (table) =>
+    function (req, res) {
+      // an open modification route for objects
+      const { features, ...vals } = req.body;
+      const whereClause = pgp.as.format(`
+      WHERE id IN (\${features:csv})
+      RETURNING id`);
+      const sql =
+        pgp.helpers.update(vals, null, { table, schema: "map_digitizer" }) +
+        whereClause;
+
+      return db.query(sql, { features }).then(send(res));
+    };
+
   app.post("/line/delete", deleteFeatures("linework"));
   app.post("/polygon/delete", deleteFeatures("polygon"));
 
   app.post("/line/change-type", changeType("linework"));
   app.post("/polygon/change-type", changeType("polygon"));
+
+  app.post("/line/modify", modify("linework"));
+  app.post("/polygon/modify", modify("polygon"));
 
   const erase = (procName) =>
     function (req, res) {
@@ -204,14 +240,27 @@ export default function featureServer(
   app.post("/line/erase", erase("lines"));
   app.post("/polygon/erase", erase("polygons"));
 
+  // Line-specific tools
+
   app.post("/line/heal", function (req, res) {
     /* Line healing is not yet supported by the Mapboard GIS app */
     let { features, type, tolerance } = req.body;
     if (tolerance == null) {
       tolerance = 0;
     } // Don't expect tolerance to be supported
+
+    // Should return messages object
+    console.log("Healing lines");
     return db
       .query(sql["heal-lines"], { features, type, tolerance })
+      .map(serializeFeature)
+      .then(send(res));
+  });
+
+  app.post("/line/reverse", (req, res) => {
+    const { features, type } = req.body;
+    return db
+      .query(sql["reverse-lines"], { features, type })
       .map(serializeFeature)
       .then(send(res));
   });
