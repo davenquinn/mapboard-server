@@ -237,7 +237,7 @@ export default function featureServer(
         .then(send(res));
     };
 
-  app.post("/line/erase", erase("lines"));
+  app.post("/line/erase", erase("lines-topological"));
   app.post("/polygon/erase", erase("polygons"));
 
   // Line-specific tools

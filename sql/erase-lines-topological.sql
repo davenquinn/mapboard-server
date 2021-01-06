@@ -4,7 +4,7 @@ WITH eraser_polygon AS (
     ${schema~}.Linework_SRID()
   ) AS geom
 ),
-eraser AS (
+topo_eraser AS (
   SELECT ST_Union(e.geom) geom
   FROM map_topology.edge e
   JOIN map_topology.__edge_relation er
@@ -14,7 +14,10 @@ eraser AS (
 features AS (
 SELECT
   *,
-  ST_CoveredBy(l.geometry, e.geom) is_covered
+  (
+    ST_CoveredBy(l.geometry, e.geom)
+    OR ST_Equals(l.geometry, (SELECT geom FROM topo_eraser))
+  ) is_covered
 FROM ${schema~}.linework l
 JOIN eraser_polygon e ON ST_Intersects(l.geometry, e.geom)
 -- The below line sets which features are erased.
@@ -27,9 +30,9 @@ WHERE coalesce(l.type = ANY(${types}::text[]), true)
 ),
 updated AS (
 UPDATE ${schema~}.linework l
-SET geometry = ST_Multi(ST_Difference(l.geometry, e.geom))
-FROM eraser e, features f
-WHERE f.id = l.id
+SET geometry = ST_Multi(ST_Difference(l.geometry, (SELECT geom FROM topo_eraser)))
+FROM features f
+WHERE l.id = f.id
   AND NOT f.is_covered
 RETURNING
   l.id,
