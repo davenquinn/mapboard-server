@@ -156,6 +156,33 @@ export default function featureServer(
       .catch(console.error);
   });
 
+  app.post("/line/reshape", async function (req, res) {
+    const geometry = parseGeometry(req.body);
+    const type = req.body.type ?? req.body.properties.type;
+    const tolerance = req.body.tolerance ?? 0;
+
+    let features: number[] = await db.query(sql["get-intersecting-lines"], {
+      type,
+      geometry,
+    });
+
+    if (features.length != 1) {
+      send({error: "Too many intersecting features"};
+    }
+    /*
+    if (features.length >= 1) {
+      const healResults = await db.query(sql["heal-lines"], {features, type, tolerance})
+      features = await db.query(sql["get-intersecting-lines"], {
+        type,
+        geometry,
+      });
+      if (features.length == 1) {
+        throw "Too many intersecting features"
+      }
+    }
+    */
+  });
+
   // Set up routes
   app.post("/polygon/new", async function (req, res) {
     const f = req.body;
