@@ -20,7 +20,7 @@ SELECT
   *,
   (
     ST_CoveredBy(l.geometry, e.geom)
-    OR ST_Equals(l.geometry, (SELECT geom FROM topo_eraser))
+    OR ST_IsEmpty(ST_Difference(l.geometry, (SELECT geom FROM topo_eraser)))
   ) is_covered
 FROM ${schema~}.linework l
 JOIN eraser_polygon e ON ST_Intersects(l.geometry, e.geom)
@@ -37,7 +37,7 @@ UPDATE ${schema~}.linework l
 SET geometry = ST_Multi(
   ST_Difference(
     l.geometry,
-    (SELECT geom FROM total_eraser)
+    (SELECT ST_Buffer(geom, 0.00001) FROM total_eraser)
   )
 )
 FROM features f
