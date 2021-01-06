@@ -6,10 +6,14 @@ WITH eraser_polygon AS (
 ),
 topo_eraser AS (
   SELECT ST_Union(e.geom) geom
-  FROM map_topology.edge e
-  JOIN map_topology.__edge_relation er
-  ON e.edge_id = er.edge_id
+  FROM map_topology.edge_data e
   JOIN eraser_polygon eA ON ST_Intersects(e.geom, eA.geom)
+),
+total_eraser AS (
+  SELECT ST_Union(
+    (SELECT geom FROM topo_eraser),
+    (SELECT geom FROM eraser_polygon)
+  ) geom
 ),
 features AS (
 SELECT
@@ -30,7 +34,12 @@ WHERE coalesce(l.type = ANY(${types}::text[]), true)
 ),
 updated AS (
 UPDATE ${schema~}.linework l
-SET geometry = ST_Multi(ST_Difference(l.geometry, (SELECT geom FROM topo_eraser)))
+SET geometry = ST_Multi(
+  ST_Difference(
+    l.geometry,
+    (SELECT geom FROM total_eraser)
+  )
+)
 FROM features f
 WHERE l.id = f.id
   AND NOT f.is_covered
