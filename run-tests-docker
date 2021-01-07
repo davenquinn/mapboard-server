@@ -18,5 +18,6 @@ conn="postgresql://postgres@localhost:${MAPBOARD_DB_PORT}/$dbname"
 psql $dbargs -c "DROP DATABASE $dbname WITH (FORCE);" || true
 createdb $dbargs $dbname || true
 
+npm run build:tests
 node ./create-tables.js --srid "${MAPBOARD_SRID:-4326}" "$conn"
 npm run test

@@ -1,3 +1,4 @@
+import "regenerator-runtime/runtime.js";
 const { serial: test } = require("ava");
 
 test("basic test", async (t) => {

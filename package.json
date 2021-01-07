@@ -8,7 +8,8 @@
   },
   "source": [
     "src/index.ts",
-    "src/cli.ts"
+    "src/cli.ts",
+    "src/test-runner.ts"
   ],
   "targets": {
     "main": false,
@@ -19,8 +20,9 @@
   "scripts": {
     "prepare": "npm run build",
     "clean": "rm -rf dist .parcel-cache",
-    "build": "npm run clean && parcel build --no-minify src/index.ts src/cli.ts",
-    "dev": "parcel watch src/index.ts src/cli.ts",
+    "build": "npm run clean && parcel build --no-minify src/index.ts src/cli.ts src/test-runner.ts",
+    "build:tests": "parcel build src/test-runner.ts",
+    "dev": "parcel watch src/index.ts src/cli.ts src/test-runner.ts",
     "compile": "./compile",
     "test": "ava"
   },
