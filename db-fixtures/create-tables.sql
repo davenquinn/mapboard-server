@@ -2,6 +2,7 @@
 This table representation serves as a minimal interface that must
 be implemented for a schema's compatibility with the Mapboard server.
 */
+CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE SCHEMA ${schema~};
 
 CREATE TABLE ${schema~}.linework_type (
