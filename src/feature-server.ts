@@ -156,6 +156,19 @@ export default function featureServer(
       .catch(console.error);
   });
 
+  app.post("/line/reshape", async function (req, res) {
+    const geometry = parseGeometry(req.body);
+    let { tolerance, ...rest } = req.body.properties;
+    tolerance = tolerance ?? 0;
+
+    return db
+      .query(sql["reshape-lines"], { geometry, tolerance, ...rest })
+      .map(serializeFeature)
+      .tap(console.log)
+      .then(send(res))
+      .catch(console.error);
+  });
+
   // Set up routes
   app.post("/polygon/new", async function (req, res) {
     const f = req.body;
@@ -238,6 +251,7 @@ export default function featureServer(
     };
 
   app.post("/line/erase", erase("lines"));
+  app.post("/line/topo-erase", erase("lines-topological"));
   app.post("/polygon/erase", erase("polygons"));
 
   // Line-specific tools

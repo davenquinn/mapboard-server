@@ -25,6 +25,8 @@ export default function metadataRoute(db, queryCache, opts) {
         "reshape",
         "topology", // This should only be on if available
         "select-features",
+        // This likewise may need to be removed if topology is not available
+        "topological-line-erase",
       ],
     });
   };

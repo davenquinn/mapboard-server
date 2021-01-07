@@ -32,17 +32,16 @@ export type SQLCache = {
   [key: string]: PGPromise.QueryFile;
 };
 
-export function buildQueryCache(opts): SQLCache {
+export function buildQueryCache(directory, params): SQLCache {
   //# Prepare SQL queries
-  const dn = path.join(__dirname, "..", "/sql");
   const sql = {};
-  for (let fn of Array.from(readdirSync(dn))) {
+  for (let fn of Array.from(readdirSync(directory))) {
     const key = path.basename(fn, ".sql");
-    const _ = path.join(dn, fn);
+    const _ = path.join(directory, fn);
     sql[key] = new pgp.QueryFile(_, {
       minify: true,
       debug: true,
-      params: { schema: opts.schema },
+      params,
     });
   }
   return sql;
