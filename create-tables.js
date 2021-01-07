@@ -28,9 +28,15 @@ if (connection == null) {
 const db = pgp(connection);
 
 const params = { schema, srid };
-const procedure = new QueryFile(`${__dirname}/db-fixtures/create-tables.sql`, {
-  params,
-});
+
+async function createFixtures() {
+  let result = [];
+  for (let file of Array.from(glob.sync(`${__dirname}/db-fixtures/*.sql`))) {
+    const sql = QueryFile(file, { params });
+    result.push(await db.query(sql));
+  }
+  return result;
+}
 
 (async function () {
   let err;
@@ -43,7 +49,7 @@ const procedure = new QueryFile(`${__dirname}/db-fixtures/create-tables.sql`, {
   }
 
   try {
-    await db.query(procedure);
+    await createFixtures();
   } catch (error1) {
     err = error1;
     console.error(err);

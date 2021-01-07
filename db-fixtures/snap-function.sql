@@ -9,6 +9,7 @@ DECLARE
 point geometry;
 buffer geometry;
 closestPoint geometry;
+diff geometry;
 res geometry;
 ix int;
 
@@ -18,14 +19,10 @@ BEGIN
 geom := ST_LineMerge(geom);
 
 -- DO for both start and endpoints
+-- 0, -1 are point indices to work with
 FOREACH ix IN ARRAY ARRAY[0,-1]
 LOOP
-  IF ix = 0 THEN
-    point := ST_StartPoint(geom);
-  ELSE
-    point := ST_EndPoint(geom);
-  END IF;
-
+  point := ST_PointN(geom, ix);
   buffer := ST_Buffer(point, width);
 
   SELECT
@@ -39,11 +36,13 @@ LOOP
   -- We have a geometry to append to
   IF closestPoint IS NOT null THEN
     buffer := ST_Buffer(closestPoint, width);
-    geom := ST_Difference(geom, buffer);
-    IF ix = -1 THEN
-      geom := ST_AddPoint(geom, closestPoint);
-    ELSE
-      geom := ST_AddPoint(geom, closestPoint, 0);
+
+    diff := ST_Difference(geom, buffer);
+    -- An empty difference can be returned when there are no features in the layer,
+    -- maybe also at other times.
+    IF NOT ST_IsEmpty(diff) THEN
+      -- ix = -1 : appending; ix = 0 : prepending
+      geom := ST_AddPoint(diff, closestPoint, ix);
     END IF;
   END IF;
 

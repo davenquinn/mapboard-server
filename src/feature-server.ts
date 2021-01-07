@@ -158,29 +158,15 @@ export default function featureServer(
 
   app.post("/line/reshape", async function (req, res) {
     const geometry = parseGeometry(req.body);
-    const type = req.body.type ?? req.body.properties.type;
-    const tolerance = req.body.tolerance ?? 0;
+    let { tolerance, ...rest } = req.body.properties;
+    tolerance = tolerance ?? 0;
 
-    let features: number[] = await db.query(sql["get-intersecting-lines"], {
-      type,
-      geometry,
-    });
-
-    if (features.length != 1) {
-      send({ error: "Too many intersecting features" });
-    }
-    /*
-    if (features.length >= 1) {
-      const healResults = await db.query(sql["heal-lines"], {features, type, tolerance})
-      features = await db.query(sql["get-intersecting-lines"], {
-        type,
-        geometry,
-      });
-      if (features.length == 1) {
-        throw "Too many intersecting features"
-      }
-    }
-    */
+    return db
+      .query(sql["reshape-lines"], { geometry, tolerance, ...rest })
+      .map(serializeFeature)
+      .tap(console.log)
+      .then(send(res))
+      .catch(console.error);
   });
 
   // Set up routes
