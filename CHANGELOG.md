@@ -5,7 +5,7 @@
 ### Changes
 
 - The Mapboard app now integrates a more advanced topology management user
-  interface, so we need to support this with new functions in the server
+  interface. We support this with new server functions
   that parallel the design of the local Spatialite database.
 - Convert to typescript from coffeescript.
 

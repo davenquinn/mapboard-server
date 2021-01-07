@@ -1,0 +1,22 @@
+#!/bin/bash -e
+# This startup script should probably be integrated into the application itself
+dbname="mapboard_test"
+MAPBOARD_SRID=32733
+
+export POSTGRES_DB="$dbname"
+export MAPBOARD_DB_PORT=54322
+
+dbargs="-h localhost -p ${MAPBOARD_DB_PORT} -U postgres"
+docker-compose up --build -d db
+while ! pg_isready $dbargs ; do
+  echo "Waiting for database..."
+  sleep 1
+done
+
+conn="postgresql://postgres@localhost:${MAPBOARD_DB_PORT}/$dbname"
+
+psql $dbargs -c "DROP DATABASE $dbname WITH (FORCE);" || true
+createdb $dbargs $dbname || true
+
+node ./create-tables.js --srid "${MAPBOARD_SRID:-4326}" "$conn"
+npm run test

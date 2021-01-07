@@ -5,16 +5,16 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const _ = require("pg-promise");
+const glob = require("glob");
 const query = (e) => console.log(e.query);
 const pgp = _({ query });
 
-const { argParser } = require("../dist");
+const { argParser } = require("./dist");
 const { dbname, srid, schema, tiles } = argParser();
 
 console.log(dbname, srid, schema);
 
 const { QueryFile } = pgp;
-const { readFileSync } = require("fs");
 
 let connection = null;
 if (dbname != null && dbname.startsWith("postgresql://")) {
@@ -27,12 +27,12 @@ if (connection == null) {
 
 const db = pgp(connection);
 
-const params = { schema, srid };
+const params = { schema, srid, data_schema: schema };
 
 async function createFixtures() {
   let result = [];
   for (let file of Array.from(glob.sync(`${__dirname}/db-fixtures/*.sql`))) {
-    const sql = QueryFile(file, { params });
+    const sql = new QueryFile(file, { params });
     result.push(await db.query(sql));
   }
   return result;

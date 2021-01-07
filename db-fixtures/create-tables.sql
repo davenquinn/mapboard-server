@@ -2,6 +2,7 @@
 This table representation serves as a minimal interface that must
 be implemented for a schema's compatibility with the Mapboard server.
 */
+CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE SCHEMA ${schema~};
 
 CREATE TABLE ${schema~}.linework_type (
@@ -12,7 +13,7 @@ CREATE TABLE ${schema~}.linework_type (
 
 CREATE TABLE ${schema~}.linework (
   id            serial PRIMARY KEY,
-  geometry      public.geometry(MultiLineString,${srid}) NOT NULL,
+  geometry      geometry(MultiLineString,${srid}) NOT NULL,
   type          text,
   created       timestamp without time zone DEFAULT now(),
   certainty     integer,
