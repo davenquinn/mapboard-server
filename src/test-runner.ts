@@ -65,3 +65,19 @@ test("we should get the same result even with longer tails in our blade geometry
   console.log(res);
   t.is(res["result"], "MULTILINESTRING((0 0,1 0,1 1,3 1,3 0,5 0))");
 });
+
+test("we should be able to reshape across multiple lines of the same type", async (t) => {
+  await db.one(testSQL["basic-insert"], {
+    type: "default",
+    table: "linework",
+    geometry: "LINESTRING(5 0, 10 0)",
+  });
+
+  const res = await db.one(testSQL["reshape"], {
+    type: "default",
+    geometry: "LINESTRING(4 -1, 4 1, 6 1, 6 -1)",
+    tolerance: 0,
+  });
+  console.log(res);
+  t.is(res["result"], "MULTILINESTRING((0 0,4 0,4 1,6 1,6 0,10 0))");
+});
