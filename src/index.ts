@@ -7,6 +7,7 @@ import tileServer from "./tile-server";
 import metaRoute from "./meta";
 import database, { buildQueryCache } from "./database";
 import html from "url:./socket-log.html";
+import { join } from "path";
 
 function appFactory(opts) {
   if (opts.schema == null) {
@@ -20,7 +21,9 @@ function appFactory(opts) {
   var app = express();
 
   const db = database(opts);
-  const queryCache = buildQueryCache(opts);
+
+  const queryDir = join(__dirname, "..", "/sql");
+  const queryCache = buildQueryCache(queryDir, opts);
 
   // This is kind of hare-brained
   app.set("db", db);
