@@ -47,12 +47,21 @@ test("insert a basic line near the origin", async (t) => {
 });
 
 test("run a reshaping operation", async (t) => {
-  const res = await db.query(testSQL["reshape"], {
+  const res = await db.one(testSQL["reshape"], {
     type: "default",
-    table: "linework",
+    geometry: "LINESTRING(1 -0.5, 1 1, 3 1, 3 -0.5)",
+    tolerance: 0,
+  });
+  console.log(res);
+  t.is(res["result"], "MULTILINESTRING((0 0,1 0,1 1,3 1,3 0,5 0))");
+});
+
+test("we should get the same result even with longer tails in our blade geometry", async (t) => {
+  const res = await db.one(testSQL["reshape"], {
+    type: "default",
     geometry: "LINESTRING(1 -1, 1 1, 3 1, 3 -1)",
     tolerance: 0,
   });
   console.log(res);
-  t.pass();
+  t.is(res["result"], "MULTILINESTRING((0 0,1 0,1 1,3 1,3 0,5 0))");
 });
