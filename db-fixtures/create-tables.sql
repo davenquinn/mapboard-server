@@ -13,7 +13,7 @@ CREATE TABLE ${schema~}.linework_type (
 
 CREATE TABLE ${schema~}.linework (
   id            serial PRIMARY KEY,
-  geometry      geometry(MultiLineString,${srid}) NOT NULL,
+  geometry      public.geometry(MultiLineString,${srid}) NOT NULL,
   type          text,
   created       timestamp without time zone DEFAULT now(),
   certainty     integer,

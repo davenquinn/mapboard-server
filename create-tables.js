@@ -6,8 +6,8 @@
  */
 const _ = require("pg-promise");
 const glob = require("glob");
-const query = (e) => console.log(e.query);
-const pgp = _({ query });
+//const query = (e) => console.log(e.query);
+const pgp = _(); //_({ query });
 
 const { argParser } = require("./dist");
 const { dbname, srid, schema, tiles } = argParser();
