@@ -167,7 +167,7 @@ export default function featureServer(
     });
 
     if (features.length != 1) {
-      send({error: "Too many intersecting features"};
+      send({ error: "Too many intersecting features" });
     }
     /*
     if (features.length >= 1) {
