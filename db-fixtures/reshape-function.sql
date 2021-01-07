@@ -71,8 +71,11 @@ d2 numeric;
 start geometry;
 middle geometry;
 tail geometry;
+grid_size float;
 out reshape_result;
 BEGIN
+
+grid_size := 0.0000001;
 
 -- Get the intersecting linework
 SELECT ST_MakeValid(ST_LineMerge(ST_Union(l.geometry)))
@@ -126,7 +129,11 @@ ELSE
   middle := ST_LineSubstring(blade, d2, d1);
 END IF;
 
-SELECT ST_Multi(ST_LineMerge(ST_Union(ARRAY[start, middle, tail]::geometry[])))
+SELECT ST_Multi(ST_LineMerge(ST_Union(ARRAY[
+  ST_SnapToGrid(start, grid_size),
+  ST_SnapToGrid(middle, grid_size),
+  ST_SnapToGrid(tail, grid_size)
+]::geometry[])))
 INTO out.result;
 
 RETURN out;
