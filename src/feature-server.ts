@@ -99,7 +99,6 @@ export default function featureServer(
 
   const selectFeatures = (table) =>
     async function (req, res) {
-      console.log(req);
       const geometry = parseGeometry(req.body);
       const tables = { table, type_table: table + "_type" };
       return db
@@ -272,9 +271,9 @@ export default function featureServer(
   });
 
   app.post("/line/reverse", (req, res) => {
-    const { features, type } = req.body;
+    const { features } = req.body;
     return db
-      .query(sql["reverse-lines"], { features, type })
+      .query(sql["reverse-lines"], { features })
       .map(serializeFeature)
       .then(send(res));
   });
