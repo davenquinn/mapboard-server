@@ -1,4 +1,14 @@
 /* Utility functions */
+
+-- Web mercator resolution (from mvt-vt-util)
+CREATE OR REPLACE FUNCTION ZRes (z integer)
+RETURNS float
+RETURNS null ON null input AS
+$$
+SELECT (40075016.6855785/(256*2^z));
+$$ LANGUAGE SQL IMMUTABLE;
+
+
 CREATE OR REPLACE FUNCTION ${data_schema~}.Linework_SRID()
 RETURNS integer AS
 $$

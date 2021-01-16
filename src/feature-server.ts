@@ -61,9 +61,10 @@ export default function featureServer(
 
   const sql = queryCache;
 
-  const featuresInArea = (table) =>
+  const featuresInArea = (table, allowSimplify = true) =>
     function (req, res) {
       const { envelope } = req.body;
+      const { zoom_level } = req.body?.properties;
       const tables = { table, type_table: table + "_type" };
       if (envelope != null) {
         // Takes care of older cases
@@ -73,10 +74,18 @@ export default function featureServer(
         return;
       }
       const geometry = parseGeometry(req.body);
-      return db
-        .query(sql["get-features-in-polygon"], { geometry, ...tables })
-        .map(serializeFeature)
-        .then(send(res));
+
+      let args = { geometry, ...tables };
+      let qfile = "get-features-in-polygon";
+
+      // We have a special path for simplified geometries if we specify a
+      // web mercator zoom level
+      if (zoom_level != null && allowSimplify) {
+        qfile += "-simplified";
+        args = { ...args, zoom_level, simplify_factor: 0.1 };
+      }
+
+      return db.query(sql[qfile], args).map(serializeFeature).then(send(res));
     };
 
   app.post("/line/features-in-area", featuresInArea("linework"));
