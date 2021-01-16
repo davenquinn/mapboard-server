@@ -7,4 +7,5 @@ RETURNING
   type,
   map_width,
   certainty,
-  coalesce(color, '#888888') color;
+  -- right now color isn't used, so we can punt on fixing it...
+  '#888888' color;
