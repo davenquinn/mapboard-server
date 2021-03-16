@@ -10,10 +10,23 @@ That project also includes processes for iteratively maintaining a topologically
 ## Setup
 
 1. Run `yarn` or `npm install` in the root directory to get the requisite node modules
-2. Run the `create-tables` command.
-3. Run the server with the `run-server` command.
+2. Run the `create-tables` command to create database tables
+   (or create them manually from the definitions in the [`db-fixtures`](https://github.com/davenquinn/mapboard-server/tree/master/db-fixtures)).
+4. Run the server with the `run-server` command.
 
 ## Compiling
 
 The server can be compiled to a single executable CLI using `pkg`. Make sure that
-`coffee` and `pkg` are installed globally.
+`coffee` and `pkg` are installed globally. (This is deprecated, the Docker installation is preferred.)
+
+## Running with Docker
+
+A fully realized testing version of the application (including database server) can be created using
+`docker-compose`, as such:
+
+```
+docker-compose up --build
+```
+
+More documentation is coming soon!
+
