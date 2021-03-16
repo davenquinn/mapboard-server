@@ -1,9 +1,11 @@
-# Map Digitizer Server
+# Mapboard Server
 
-A server component that interfaces with the Map-Digitizer app, an in-development iPad client for
-digitizing mapping data.
+A server component that interfaces with [Mapboard GIS](https://mapboard-gis.app), an iPad app for digitizing geologic maps.
+This extension allows you to store your data in a PostGIS database and slickly edit it with an *Apple Pencil* stylus.
 
-This allows you to store your data in a PostGIS database and edit it with a slick digitizing stylus.
+This project contains APIs for driving map editing from within the app. These APIs can also be used as part of
+the [PostGIS Geologic Map](https://github.com/davenquinn/PostGIS-Geologic-Map) project (this module is a submodule).
+That project also includes processes for iteratively maintaining a topologically valid geologic map.
 
 ## Setup
 
