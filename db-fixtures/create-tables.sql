@@ -2,6 +2,7 @@
 This table representation serves as a minimal interface that must
 be implemented for a schema's compatibility with the Mapboard server.
 */
+CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE SCHEMA ${schema~};
 
 CREATE TABLE ${schema~}.linework_type (
@@ -49,6 +50,8 @@ CREATE TABLE ${schema~}.polygon (
   created       timestamp without time zone DEFAULT now(),
   certainty     integer,
   zoom_level    integer,
+  pixel_width   numeric,
+  map_width     numeric,
   hidden        boolean DEFAULT false,
   source        text,
   name          text,
