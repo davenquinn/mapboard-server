@@ -7,6 +7,10 @@ import { Buffer } from "buffer";
 
 //# Support functions ##
 
+function log(d) {
+  //console.log(d)
+}
+
 const serializeFeature = function (r) {
   const geometry = Buffer.from(r.geometry, "hex").toString("base64");
   const { id, pixel_width, map_width, certainty } = r;
@@ -42,7 +46,7 @@ const serializeFeature = function (r) {
 
 const parseGeometry = function (f) {
   // Parses a geojson (or wkb, or ewkb) feature to geometry
-  console.log(f.geometry);
+  //console.log(f.geometry);
   return wkx.Geometry.parse(f.geometry).toEwkb().toString("hex");
 };
 
@@ -117,6 +121,7 @@ export default function featureServer(
   app.post("/line/new", async function (req, res) {
     const f = req.body;
     const p = f.properties;
+    console.log(p);
     // This should likely be handled better by the backend
     if (p.snap_types == null) {
       p.snap_types = null;
@@ -125,6 +130,7 @@ export default function featureServer(
       p.snap_width = 2 * map_width;
     }
 
+    /* Topological snapping is broken somehow!
     if (p.snap_types != null && p.snap_types.length === 1) {
       try {
         const { topology } = await db.one(sql["get-topology"], {
@@ -132,14 +138,16 @@ export default function featureServer(
         });
         if (topology != null) {
           const vals = await db.query(sql["topology-types"], { topology });
+          console.log(vals);
           p.snap_types = vals.map((d) => d.id);
           console.log(`Topological snapping to ${p.snap_types}`);
         }
       } catch (err) {
         console.error(err);
-        console.error("Couldn't enable topological mapping");
+        console.error("Couldn't enable topological snapping");
       }
     }
+    */
 
     const data = {
       geometry: parseGeometry(f),
@@ -150,7 +158,7 @@ export default function featureServer(
     return db
       .query(sql["new-line"], data)
       .map(serializeFeature)
-      .tap(console.log)
+      .tap(log)
       .then(send(res))
       .catch(console.error);
   });
@@ -163,7 +171,7 @@ export default function featureServer(
     return db
       .query(sql["reshape-lines"], { geometry, tolerance, ...rest })
       .map(serializeFeature)
-      .tap(console.log)
+      .tap(log)
       .then(send(res))
       .catch(console.error);
   });
@@ -245,7 +253,7 @@ export default function featureServer(
       return db
         .query(sql[`erase-${procName}`], { geometry, types })
         .map(serializeFeature)
-        .tap(console.log)
+        .tap(log)
         .then(send(res));
     };
 
