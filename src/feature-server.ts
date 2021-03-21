@@ -7,6 +7,10 @@ import { Buffer } from "buffer";
 
 //# Support functions ##
 
+function log(d) {
+  //console.log(d)
+}
+
 const serializeFeature = function (r) {
   const geometry = Buffer.from(r.geometry, "hex").toString("base64");
   const { id, pixel_width, map_width, certainty } = r;
@@ -42,7 +46,7 @@ const serializeFeature = function (r) {
 
 const parseGeometry = function (f) {
   // Parses a geojson (or wkb, or ewkb) feature to geometry
-  console.log(f.geometry);
+  //console.log(f.geometry);
   return wkx.Geometry.parse(f.geometry).toEwkb().toString("hex");
 };
 
@@ -99,7 +103,6 @@ export default function featureServer(
 
   const selectFeatures = (table) =>
     async function (req, res) {
-      console.log(req);
       const geometry = parseGeometry(req.body);
       const tables = { table, type_table: table + "_type" };
       return db
@@ -118,6 +121,7 @@ export default function featureServer(
   app.post("/line/new", async function (req, res) {
     const f = req.body;
     const p = f.properties;
+    console.log(p);
     // This should likely be handled better by the backend
     if (p.snap_types == null) {
       p.snap_types = null;
@@ -126,19 +130,26 @@ export default function featureServer(
       p.snap_width = 2 * map_width;
     }
 
+    /* Topological snapping is broken somehow! */
+
     if (p.snap_types != null && p.snap_types.length === 1) {
       try {
-        const { topology } = await db.one(sql["get-topology"], {
+        const res = await db.one(sql["get-topology"], {
           id: p.snap_types[0],
         });
-        if (topology != null) {
-          const vals = await db.query(sql["topology-types"], { topology });
+        console.log(res);
+        if (res.topology != null) {
+          const vals = await db.query(sql["topology-types"], {
+            // We now provide a default value for topology in first-stage mapping, apparently??
+            topo: res.topology,
+          });
+          console.log(vals);
           p.snap_types = vals.map((d) => d.id);
           console.log(`Topological snapping to ${p.snap_types}`);
         }
       } catch (err) {
         console.error(err);
-        console.error("Couldn't enable topological mapping");
+        console.error("Couldn't enable topological snapping");
       }
     }
 
@@ -151,7 +162,7 @@ export default function featureServer(
     return db
       .query(sql["new-line"], data)
       .map(serializeFeature)
-      .tap(console.log)
+      .tap(log)
       .then(send(res))
       .catch(console.error);
   });
@@ -164,7 +175,7 @@ export default function featureServer(
     return db
       .query(sql["reshape-lines"], { geometry, tolerance, ...rest })
       .map(serializeFeature)
-      .tap(console.log)
+      .tap(log)
       .then(send(res))
       .catch(console.error);
   });
@@ -246,7 +257,7 @@ export default function featureServer(
       return db
         .query(sql[`erase-${procName}`], { geometry, types })
         .map(serializeFeature)
-        .tap(console.log)
+        .tap(log)
         .then(send(res));
     };
 
@@ -272,9 +283,9 @@ export default function featureServer(
   });
 
   app.post("/line/reverse", (req, res) => {
-    const { features, type } = req.body;
+    const { features } = req.body;
     return db
-      .query(sql["reverse-lines"], { features, type })
+      .query(sql["reverse-lines"], { features })
       .map(serializeFeature)
       .then(send(res));
   });

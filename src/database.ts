@@ -4,7 +4,10 @@ import colors from "colors";
 import path from "path";
 import { readdirSync } from "fs";
 
+const QUIET = true;
+
 const logFunc = function (e) {
+  if (QUIET) return;
   console.log(colors.grey(e.query));
   if (e.params != null) {
     return console.log("    " + colors.cyan(e.params));
