@@ -130,14 +130,19 @@ export default function featureServer(
       p.snap_width = 2 * map_width;
     }
 
-    /* Topological snapping is broken somehow!
+    /* Topological snapping is broken somehow! */
+
     if (p.snap_types != null && p.snap_types.length === 1) {
       try {
-        const { topology } = await db.one(sql["get-topology"], {
+        const res = await db.one(sql["get-topology"], {
           id: p.snap_types[0],
         });
-        if (topology != null) {
-          const vals = await db.query(sql["topology-types"], { topology });
+        console.log(res);
+        if (res.topology != null) {
+          const vals = await db.query(sql["topology-types"], {
+            // We now provide a default value for topology in first-stage mapping, apparently??
+            topo: res.topology,
+          });
           console.log(vals);
           p.snap_types = vals.map((d) => d.id);
           console.log(`Topological snapping to ${p.snap_types}`);
@@ -147,7 +152,6 @@ export default function featureServer(
         console.error("Couldn't enable topological snapping");
       }
     }
-    */
 
     const data = {
       geometry: parseGeometry(f),
