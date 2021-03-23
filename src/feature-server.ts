@@ -295,15 +295,13 @@ export default function featureServer(
       table: table + "_type",
     });
     console.log(`${data.length} rows returned\n`.green);
-    return res.send(
-      data.map((d) => {
-        return {
-          ...d,
-          id: d.id.trim(),
-          color: d.color?.trim() ?? "#000000",
-          name: d.name.trim(),
-        };
-      })
+    res.send(
+      data.map((d) => ({
+        ...d,
+        id: d.id.trim(),
+        color: d.color?.trim() ?? "#000000",
+        name: d.name.trim(),
+      }))
     );
   };
 
