@@ -290,10 +290,22 @@ export default function featureServer(
       .then(send(res));
   });
 
-  const types = (table) => (req, res) =>
-    db
-      .query(sql["get-feature-types"], { table: table + "_type" })
-      .then(send(res));
+  const types = (table) => async (req, res) => {
+    const data = await db.query(sql["get-feature-types"], {
+      table: table + "_type",
+    });
+    console.log(`${data.length} rows returned\n`.green);
+    return res.send(
+      data.map((d) => {
+        return {
+          ...d,
+          id: d.id.trim(),
+          color: d.color?.trim() ?? "#000000",
+          name: d.name.trim(),
+        };
+      })
+    );
+  };
 
   app.get("/line/types", types("linework"));
   app.get("/polygon/types", types("polygon"));
