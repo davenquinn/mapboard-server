@@ -101,6 +101,14 @@ export default function featureServer(
       .then(send(res));
   });
 
+  app.post("/cross-section/features-in-area", function (req, res) {
+    const geometry = parseGeometry(req.body);
+    return db
+      .query(sql["get-cross-section-units"], { geometry })
+      .map(serializeFeature)
+      .then(send(res));
+  });
+
   // Selection
 
   const selectFeatures = (table) =>
