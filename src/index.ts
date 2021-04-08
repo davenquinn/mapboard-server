@@ -6,6 +6,7 @@ import topologyWatcher from "./topology-watcher";
 import tileServer from "./tile-server";
 import metaRoute from "./meta";
 import database, { buildQueryCache } from "./database";
+import cors from "cors";
 import html from "url:./socket-log.html";
 import { join } from "path";
 
@@ -19,6 +20,8 @@ function appFactory(opts) {
   }
 
   var app = express();
+  app.use(cors());
+  app.options("*", cors());
 
   const db = database(opts);
 
