@@ -6,6 +6,9 @@
   "bin": {
     "mapboard": "dist/cli.js"
   },
+  "engines": {
+    "node": "12.x"
+  },
   "source": [
     "src/index.ts",
     "src/cli.ts",
