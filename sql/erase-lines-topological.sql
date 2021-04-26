@@ -6,7 +6,7 @@ WITH eraser_polygon AS (
 ),
 topo_eraser AS (
   SELECT ST_Union(e.geom) geom
-  FROM map_topology.edge_data e
+  FROM ${topo_schema~}.edge_data e
   JOIN eraser_polygon eA ON ST_Intersects(e.geom, eA.geom)
 ),
 total_eraser AS (

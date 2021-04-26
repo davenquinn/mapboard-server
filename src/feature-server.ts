@@ -8,8 +8,10 @@ import { Buffer } from "buffer";
 //# Support functions ##
 
 function log(d) {
-  //console.log(d)
+  console.log(d);
 }
+
+const schema = process.env.MAPBOARD_SCHEMA || "map_digitizer";
 
 const serializeFeature = function (r) {
   const geometry = Buffer.from(r.geometry, "hex").toString("base64");
@@ -230,8 +232,7 @@ export default function featureServer(
       WHERE id IN (\${features:csv})
       RETURNING id`);
       const sql =
-        pgp.helpers.update(vals, null, { table, schema: "map_digitizer" }) +
-        whereClause;
+        pgp.helpers.update(vals, null, { table, schema }) + whereClause;
 
       return db.query(sql, { features }).then(send(res));
     };

@@ -1,5 +1,5 @@
 import "regenerator-runtime/runtime.js";
-const { serial: test } = require("ava");
+import { serial as test } from "ava";
 import database, { buildQueryCache } from "./database";
 import { join } from "path";
 
@@ -9,7 +9,7 @@ const db = database({
 
 const queryDir = join(__dirname, "..", "/sql");
 const opts = {
-  schema: "map_digitizer",
+  schema: process.env.MAPBOARD_SCHEMA || "map_digitizer",
 };
 const sql = buildQueryCache(queryDir, opts);
 const testSQL = buildQueryCache(join(__dirname, "..", "/sql/testing"), {

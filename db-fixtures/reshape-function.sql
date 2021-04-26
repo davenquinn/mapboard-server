@@ -41,7 +41,7 @@ RETURNS geometry AS
 $$
 SELECT ST_Transform(
   ST_SetSRID(geom, 4326),
-  map_digitizer.Linework_SRID()
+  ${data_schema~}.Linework_SRID()
 )
 $$ LANGUAGE SQL IMMUTABLE;
 
@@ -80,14 +80,14 @@ grid_size := 0.0000001;
 -- Get the intersecting linework
 SELECT ST_MakeValid(ST_LineMerge(ST_Union(l.geometry)))
 INTO subject
-FROM map_digitizer.linework l
+FROM ${data_schema~}.linework l
 WHERE ST_Intersects(l.geometry, blade)
   AND NOT l.hidden
   AND l.type = linework_type;
 
 SELECT array_agg(l.id)
 INTO out.deleted
-FROM map_digitizer.linework l
+FROM ${data_schema~}.linework l
 WHERE ST_Intersects(l.geometry, blade)
   AND NOT l.hidden
   AND l.type = linework_type;
