@@ -1,4 +1,4 @@
-UPDATE map_digitizer.linework
+UPDATE ${schema~}.linework
 SET geometry = ST_Reverse(geometry)
 WHERE id IN (${features:csv})
 RETURNING

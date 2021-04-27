@@ -25,7 +25,7 @@ be rewritten and mounted at tiles/`,
     .option("schema", {
       describe: "Schema for tables",
       type: "string",
-      default: "map_digitizer",
+      default: process.env.MAPBOARD_SCHEMA ?? "map_digitizer",
     })
     .help("h")
     .alias("h", "help");

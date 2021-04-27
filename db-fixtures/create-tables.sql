@@ -40,7 +40,10 @@ Other columns can also be added to this table as appropriate
 CREATE TABLE ${schema~}.polygon_type (
     id text PRIMARY KEY,
     name text,
-    color text
+    color text,
+    -- Optional, for display...
+    symbol text,
+    symbol_color text
 );
 
 CREATE TABLE ${schema~}.polygon (

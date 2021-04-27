@@ -1,4 +1,4 @@
-INSERT INTO map_digitizer.linework (geometry, type, map_width)
+INSERT INTO ${schema~}.linework (geometry, type, map_width)
 VALUES
 (ST_Multi('SRID=32611;LINESTRING(0 0, 1 0)'), 'bedrock-contact', 0.2),
 (ST_Multi('SRID=32611;LINESTRING(1 0, 2 0)'), 'bedrock-contact', 0.2),
