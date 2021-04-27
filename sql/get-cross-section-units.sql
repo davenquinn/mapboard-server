@@ -11,7 +11,7 @@ SELECT
   2 map_width,
   null certainty,
   coalesce(color, '#888888') color
-FROM cross_section.unit_outcrop
+FROM ${schema~}.unit_outcrop
 WHERE geometry && (SELECT bounds FROM f)
   AND ST_Intersects(geometry, (SELECT bounds FROM f))
 
