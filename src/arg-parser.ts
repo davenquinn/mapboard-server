@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from "fs";
 export function argParser() {
   const { argv } = require("yargs")
     .usage(
-      '$0 [--schema "schema"] [--tiles "tilelive-config"] [--srid 4326 ] dbname'
+      '$0 [--schema "schema"] [--topology "topology"] [--tiles "tilelive-config"] [--srid 4326 ] dbname'
     )
     .option("srid", {
       describe: `SRID for database features \
@@ -26,6 +26,13 @@ be rewritten and mounted at tiles/`,
       describe: "Schema for tables",
       type: "string",
       default: process.env.MAPBOARD_SCHEMA ?? "map_digitizer",
+    })
+    .help("h")
+    .alias("h", "help")
+    .option("topology", {
+      describe: "Topology to use",
+      type: "string",
+      default: process.env.MAPBOARD_TOPOLOGY ?? "map_topology",
     })
     .help("h")
     .alias("h", "help");

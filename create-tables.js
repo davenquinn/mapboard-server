@@ -9,8 +9,8 @@ const glob = require("glob");
 //const query = (e) => console.log(e.query);
 const pgp = _(); //_({ query });
 
-const { argParser } = require("./dist");
-const { dbname, srid, schema, tiles } = argParser();
+const { argParser, topologyWatcher } = require("./dist");
+const { dbname, srid, schema, tiles, topology } = argParser();
 
 console.log(dbname, srid, schema);
 
@@ -27,7 +27,13 @@ if (connection == null) {
 
 const db = pgp(connection);
 
-const params = { schema, srid, data_schema: schema };
+const params = {
+  schema,
+  srid,
+  data_schema: schema,
+  topo_schema: topology,
+  topology,
+};
 
 async function createFixtures() {
   let result = [];
