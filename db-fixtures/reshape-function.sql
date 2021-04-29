@@ -107,6 +107,7 @@ BEGIN
   d2 := ST_LineLocatePoint(subject, end_point);
 EXCEPTION WHEN others THEN
   -- We are in a more complex case where we want to manage multiple points
+  RAISE ERROR 'reshaping did not work: %', others;
   SELECT null INTO out.result;
   SELECT ARRAY[]::integer[] INTO out.deleted;
   RETURN out;
