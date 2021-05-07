@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION ${data_schema~}.Linework_SnapEndpoints(
   width numeric,
   types text[]
 )
-RETURNS snapping_returntype AS
+RETURNS ${data_schema~}.snapping_returntype AS
 $$
 DECLARE
 point geometry;
@@ -70,7 +70,9 @@ BEGIN
     END IF;
   END LOOP;
 
-EXCEPTION WHEN OTHERS THEN
+  geom := ST_Multi(ST_MakeValid(geom));
+
+EXCEPTION WHEN others THEN
   err_message := SQLERRM;
 END;
 
