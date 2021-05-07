@@ -10,7 +10,13 @@ import cors from "cors";
 import html from "url:./socket-log.html";
 import { join } from "path";
 
-function appFactory(opts) {
+interface MapboardServerOptions {
+  schema?: string;
+  topology?: string;
+  tiles?: any;
+}
+
+function appFactory(opts: MapboardServerOptions = {}) {
   if (opts.schema == null) {
     opts.schema = "map_digitizer";
   }
@@ -32,7 +38,7 @@ function appFactory(opts) {
   app.set("db", db);
   app.set("sql", queryCache);
 
-  app.use("/", featureServer(db, queryCache));
+  app.use("/", featureServer(db, queryCache, opts));
   app.get("/meta", metaRoute(db, queryCache, opts));
 
   if (opts.tiles != null) {

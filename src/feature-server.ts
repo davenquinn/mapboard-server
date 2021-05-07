@@ -60,7 +60,8 @@ const send = (res) =>
 
 export default function featureServer(
   db: IDatabase<any, any>,
-  queryCache: SQLCache
+  queryCache: SQLCache,
+  opts = {}
 ) {
   const app = express();
   app.use(bodyParser.json({ limit: "50mb", extended: true }));
@@ -92,7 +93,7 @@ export default function featureServer(
     // This should fail silently or return error if topology doesn't exist
     const geometry = parseGeometry(req.body);
     const tableNames = {
-      topo_schema: "map_topology",
+      topo_schema: opts.topology,
       table: "face_display",
     };
     return db

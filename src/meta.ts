@@ -2,7 +2,7 @@ const { version } = require("../package.json");
 
 async function getTopologyInfo(db, sql, topology) {
   const res = await db.oneOrNone(sql["get-topology-info"], {
-    topology: "map_topology",
+    topology,
   });
   if (res == null || Object.keys(res).length == 0) return null;
   return res;

@@ -6,11 +6,11 @@ import { readdirSync } from "fs";
 
 const QUIET = true;
 
-const logFunc = function (e) {
+const logFunc = function (event) {
   if (QUIET) return;
-  console.log(colors.grey(e.query));
-  if (e.params != null) {
-    return console.log("    " + colors.cyan(e.params));
+  console.log(colors.grey(event.query));
+  if (event.params != null) {
+    console.log("    " + colors.cyan(event.params));
   }
 };
 
@@ -19,7 +19,7 @@ const connectFunc = function (client, dc, isFresh) {
     return client.on("notice", function (msg) {
       const v = `${msg.severity} ${msg.code}: ` + msg.where;
       console.log(v);
-      return console.log("msg %j", msg);
+      console.log("msg %j", msg);
     });
   }
 };
@@ -28,7 +28,7 @@ export const pgp = PGPromise({
   capSQL: true,
   promiseLib: Bluebird,
   query: logFunc,
-  connect: connectFunc,
+  //connect: connectFunc,
 });
 
 export type SQLCache = {
