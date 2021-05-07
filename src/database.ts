@@ -4,7 +4,7 @@ import colors from "colors";
 import path from "path";
 import { readdirSync } from "fs";
 
-const QUIET = true;
+const QUIET = false;
 
 const logFunc = function (event) {
   if (QUIET) return;
@@ -53,13 +53,13 @@ export function buildQueryCache(directory, params): SQLCache {
 export default function database(opts) {
   // Can pass in dbname or db object
   let { db_conn, connection } = opts;
-  db_conn = db_conn ?? connection;
   if (
+    db_conn != null &&
     !(db_conn.startsWith("postgres://") || db_conn.startsWith("postgresql://"))
   ) {
     db_conn = "postgres://" + db_conn;
   }
-  return pgp(db_conn);
+  return pgp(connection ?? db_conn);
 }
 
 export const { QueryFile } = pgp;

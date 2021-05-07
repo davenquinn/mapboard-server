@@ -1,5 +1,5 @@
-DROP TYPE IF EXISTS ${data_schema~}.snapping_returntype;
 DROP FUNCTION IF EXISTS ${data_schema~}.Linework_SnapEndpoints(geometry,numeric,text[]);
+DROP TYPE IF EXISTS ${data_schema~}.snapping_returntype;
 
 CREATE TYPE ${data_schema~}.snapping_returntype AS (
   geometry   geometry,
@@ -9,7 +9,7 @@ CREATE TYPE ${data_schema~}.snapping_returntype AS (
 );
 
 CREATE OR REPLACE FUNCTION ${data_schema~}.Linework_SnapEndpoints(
-  geom geometry,
+  input geometry,
   width numeric,
   types text[]
 )
@@ -18,6 +18,7 @@ $$
 DECLARE
 point geometry;
 buffer geometry;
+geom geometry;
 closestPoint geometry;
 res geometry;
 ix int;
@@ -28,13 +29,11 @@ ret record;
 
 BEGIN
 
--- Make sure we aren't dealing with multipolygons
-geom := ST_LineMerge(geom);
-start_snapped := false;
-end_snapped := false;
-err_message := null;
-
-BEGIN
+  -- Make sure we aren't dealing with multipolygons
+  geom := ST_LineMerge(input);
+  start_snapped := false;
+  end_snapped := false;
+  err_message := null;
 
   -- DO for both start and endpoints
   -- 0, -1 are point indices to work with
@@ -70,21 +69,27 @@ BEGIN
     END IF;
   END LOOP;
 
-  geom := ST_Multi(ST_MakeValid(geom));
+  -- Construct our record set
+  SELECT
+    ST_Multi(ST_MakeValid(geom)) geometry,
+    start_snapped,
+    end_snapped,
+    err_message
+  INTO ret;
+
+  RETURN ret;
 
 EXCEPTION WHEN others THEN
-  err_message := SQLERRM;
-END;
 
--- Construct our record set
-SELECT
-  geom geometry,
-  start_snapped,
-  end_snapped,
-  err_message
-INTO ret;
+  -- Construct an error record set
+  SELECT
+    ST_Multi(ST_MakeValid(input)),
+    false,
+    false,
+    SQLERRM
+  INTO ret;
 
-RETURN ret;
+  RETURN ret;
 
 END;
 $$
