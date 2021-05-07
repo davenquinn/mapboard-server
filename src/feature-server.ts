@@ -102,16 +102,6 @@ export default function featureServer(
       .then(send(res));
   });
 
-  // This should only be defined if the feature exists...
-  // It's a total hack.
-  app.post("/cross-section/features-in-area", function (req, res) {
-    const geometry = parseGeometry(req.body);
-    return db
-      .query(sql["get-cross-section-units"], { geometry })
-      .map(serializeFeature)
-      .then(send(res));
-  });
-
   // Selection
 
   const selectFeatures = (table) =>
