@@ -169,11 +169,10 @@ export default function featureServer(
       ...p,
     };
 
-    console.log(data);
     return db
       .query(sql["new-line"], data)
+      .tap((d) => console.log({ ...d[0], geometry: "..." }))
       .map(serializeFeature)
-      .tap(log)
       .then(send(res))
       .catch(console.error);
   });

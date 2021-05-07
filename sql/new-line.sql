@@ -34,7 +34,8 @@ SELECT
   false AS erased,
   s.start_snapped,
   s.end_snapped,
-  s.err_message
+  s.err_message,
+  s.err_context
 FROM
   newline l
 JOIN ${schema~}.linework_type t

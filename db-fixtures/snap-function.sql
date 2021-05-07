@@ -5,7 +5,8 @@ CREATE TYPE ${data_schema~}.snapping_returntype AS (
   geometry   geometry,
   start_snapped boolean,
   end_snapped boolean,
-  err_message text
+  err_message text,
+  err_context text
 );
 
 CREATE OR REPLACE FUNCTION ${data_schema~}.Linework_SnapEndpoints(
@@ -24,8 +25,8 @@ res geometry;
 ix int;
 start_snapped boolean;
 end_snapped boolean;
-err_message text;
-ret record;
+ret ${data_schema~}.snapping_returntype;
+err_context text;
 
 BEGIN
 
@@ -33,7 +34,6 @@ BEGIN
   geom := ST_LineMerge(input);
   start_snapped := false;
   end_snapped := false;
-  err_message := null;
 
   -- DO for both start and endpoints
   -- 0, -1 are point indices to work with
@@ -55,10 +55,12 @@ BEGIN
       AND NOT l.hidden
       AND coalesce((l.type = ANY(types)), true);
 
+    RAISE NOTICE 'geom: %', ST_AsText(geom);
     -- We have a geometry to append to
     IF closestPoint IS NOT null THEN
       buffer := ST_Buffer(closestPoint, width);
       geom := ST_Difference(geom, buffer);
+      RAISE NOTICE 'geom: %', ST_AsText(geom);
       IF ix = -1 THEN
         geom := ST_AddPoint(geom, closestPoint);
         end_snapped := true;
@@ -74,19 +76,22 @@ BEGIN
     ST_Multi(ST_MakeValid(geom)) geometry,
     start_snapped,
     end_snapped,
-    err_message
+    null,
+    null
   INTO ret;
 
   RETURN ret;
 
 EXCEPTION WHEN others THEN
+  GET STACKED DIAGNOSTICS err_context = PG_EXCEPTION_CONTEXT;
 
   -- Construct an error record set
   SELECT
-    ST_Multi(ST_MakeValid(input)),
+    ST_Multi(ST_MakeValid(ST_LineMerge(input))),
     false,
     false,
-    SQLERRM
+    SQLERRM,
+    err_context
   INTO ret;
 
   RETURN ret;
