@@ -7,6 +7,7 @@ import tileServer from "./tile-server";
 import metaRoute from "./meta";
 import database, { buildQueryCache } from "./database";
 import cors from "cors";
+// @ts-ignore
 import html from "url:./socket-log.html";
 import { join } from "path";
 

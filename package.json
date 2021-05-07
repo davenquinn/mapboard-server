@@ -23,8 +23,7 @@
   "scripts": {
     "prepare": "npm run build",
     "clean": "rm -rf dist .parcel-cache",
-    "build": "npm run clean && parcel build --target node src/index.ts src/cli.ts src/test-runner.ts",
-    "build:tests": "parcel build src/test-runner.ts",
+    "build": "parcel build --target node src/index.ts src/cli.ts src/test-runner.ts",
     "dev": "parcel watch src/index.ts src/cli.ts src/test-runner.ts",
     "compile": "./compile",
     "test": "ava"
@@ -49,7 +48,7 @@
     "tilelive-cache": "^0.7.1",
     "tilelive-modules": "^0.4.2",
     "wkx": "^0.4.1",
-    "yargs": "^8.0.2"
+    "yargs": "^16.2.0"
   },
   "pkg": {
     "assets": [
@@ -62,6 +61,7 @@
     "@parcel/babel-preset-env": "^2.0.0-nightly.537+49ac2175",
     "ava": "^3.15.0",
     "parcel": "^2.0.0-beta.1",
+    "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
   }
 }

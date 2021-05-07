@@ -52,14 +52,14 @@ export function buildQueryCache(directory, params): SQLCache {
 
 export default function database(opts) {
   // Can pass in dbname or db object
-  let { dbname, connection } = opts;
-  if (dbname != null && dbname.startsWith("postgres://")) {
-    connection = dbname;
+  let { db_conn, connection } = opts;
+  if (
+    db_conn != null &&
+    !(db_conn.startsWith("postgres://") || db_conn.startsWith("postgresql://"))
+  ) {
+    db_conn = "postgres://" + db_conn;
   }
-  if (connection == null) {
-    connection = `postgres:///${dbname}`;
-  }
-  return pgp(connection);
+  return pgp(connection ?? db_conn);
 }
 
 export const { QueryFile } = pgp;

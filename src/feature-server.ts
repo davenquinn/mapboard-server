@@ -124,7 +124,7 @@ export default function featureServer(
   app.post("/line/new", async function (req, res) {
     const f = req.body;
     const p = f.properties;
-    console.log(p);
+    console.log({ ...p, geometry: "..." });
     // This should likely be handled better by the backend
     if (p.snap_types == null) {
       p.snap_types = null;
@@ -140,13 +140,11 @@ export default function featureServer(
         const res = await db.one(sql["get-topology"], {
           id: p.snap_types[0],
         });
-        console.log(res);
         if (res.topology != null) {
           const vals = await db.query(sql["topology-types"], {
             // We now provide a default value for topology in first-stage mapping, apparently??
             topo: res.topology,
           });
-          console.log(vals);
           p.snap_types = vals.map((d) => d.id);
           console.log(`Topological snapping to ${p.snap_types}`);
         }
@@ -161,11 +159,10 @@ export default function featureServer(
       ...p,
     };
 
-    console.log(data);
     return db
       .query(sql["new-line"], data)
+      .tap((d) => console.log({ ...d[0], geometry: "..." }))
       .map(serializeFeature)
-      .tap(log)
       .then(send(res))
       .catch(console.error);
   });
