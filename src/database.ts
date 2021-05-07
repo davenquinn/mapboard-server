@@ -4,7 +4,7 @@ import colors from "colors";
 import path from "path";
 import { readdirSync } from "fs";
 
-const QUIET = false;
+const QUIET = true;
 
 const logFunc = function (event) {
   if (QUIET) return;

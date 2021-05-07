@@ -45,7 +45,8 @@ BEGIN
       point := ST_EndPoint(geom);
     END IF;
 
-    buffer := ST_Buffer(point, width);
+    -- do buffering using geography so that we always are working in meters
+    buffer := ST_Buffer(point::geography, width)::geometry;
 
     SELECT
       ST_ClosestPoint(ST_Intersection(l.geometry, buffer), point)
@@ -55,12 +56,10 @@ BEGIN
       AND NOT l.hidden
       AND coalesce((l.type = ANY(types)), true);
 
-    RAISE NOTICE 'geom: %', ST_AsText(geom);
     -- We have a geometry to append to
     IF closestPoint IS NOT null THEN
-      buffer := ST_Buffer(closestPoint, width);
+      buffer := ST_Buffer(closestPoint::geography, width)::geometry;
       geom := ST_Difference(geom, buffer);
-      RAISE NOTICE 'geom: %', ST_AsText(geom);
       IF ix = -1 THEN
         geom := ST_AddPoint(geom, closestPoint);
         end_snapped := true;
