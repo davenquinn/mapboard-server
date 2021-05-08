@@ -9,6 +9,23 @@ CREATE TYPE ${data_schema~}.snapping_returntype AS (
   err_context text
 );
 
+-- Create a buffer using geography or geometry, to allow
+-- us to use meters for buffering even when working in lat/lon
+-- coordinate systems.
+CREATE OR REPLACE FUNCTION ${data_schema~}.create_buffer(
+  input geometry,
+  width numeric
+)
+RETURNS geometry AS $$
+BEGIN
+  RETURN ST_Buffer(input::geography, width)::geometry;
+-- we could probably do this without catching the exception
+EXCEPTION WHEN others THEN
+  RETURN ST_Buffer(input, width);
+END;
+$$
+LANGUAGE 'plpgsql' IMMUTABLE;
+
 CREATE OR REPLACE FUNCTION ${data_schema~}.Linework_SnapEndpoints(
   input geometry,
   width numeric,
@@ -46,7 +63,7 @@ BEGIN
     END IF;
 
     -- do buffering using geography so that we always are working in meters
-    buffer := ST_Buffer(point::geography, width)::geometry;
+    buffer := ${data_schema~}.create_buffer(point, width);
 
     SELECT
       ST_ClosestPoint(ST_Intersection(l.geometry, buffer), point)
@@ -58,7 +75,7 @@ BEGIN
 
     -- We have a geometry to append to
     IF closestPoint IS NOT null THEN
-      buffer := ST_Buffer(closestPoint::geography, width)::geometry;
+      buffer := ${data_schema~}.create_buffer(closestPoint, width);
       geom := ST_Difference(geom, buffer);
       IF ix = -1 THEN
         geom := ST_AddPoint(geom, closestPoint);
