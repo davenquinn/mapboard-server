@@ -7,7 +7,7 @@
     "mapboard": "dist/cli.js"
   },
   "engines": {
-    "node": "12.x"
+    "node": "12.x || 14.x"
   },
   "source": [
     "src/index.ts",
@@ -29,8 +29,8 @@
     "test": "ava"
   },
   "dependencies": {
-    "@mapbox/mbtiles": "^0.10.0",
-    "@mapbox/tilelive": "^6.0.0",
+    "@mapbox/mbtiles": "^0.12.1",
+    "@mapbox/tilelive": "^6.1.0",
     "bluebird": "^3.7.2",
     "body-parser": "^1.17.1",
     "coffeescript": "^2.5.1",
