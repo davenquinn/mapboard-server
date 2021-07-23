@@ -4,27 +4,16 @@ import { createServer as createServerBase } from "http";
 import featureServer from "./feature-server";
 import topologyWatcher from "./topology-watcher";
 import tileServer from "./tile-server";
-import metaRoute from "./meta";
+import metaRoute, { MapboardServerOptions } from "./meta";
 import database, { buildQueryCache } from "./database";
 import cors from "cors";
 // @ts-ignore
 import html from "url:./socket-log.html";
 import { join } from "path";
 
-interface MapboardServerOptions {
-  schema?: string;
-  topology?: string;
-  tiles?: any;
-}
-
 function appFactory(opts: MapboardServerOptions = {}) {
-  if (opts.schema == null) {
-    opts.schema = "map_digitizer";
-  }
-
-  if (opts.topology == null) {
-    opts.topology = "map_topology";
-  }
+  opts.schema ??= "map_digitizer";
+  opts.topology ??= "map_topology";
 
   var app = express();
   app.use(cors());

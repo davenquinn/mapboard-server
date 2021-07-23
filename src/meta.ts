@@ -8,11 +8,25 @@ async function getTopologyInfo(db, sql, topology) {
   return res;
 }
 
-export default function metadataRoute(db, queryCache, opts) {
+export interface MapboardServerOptions {
+  schema?: string;
+  topology?: string;
+  tiles?: any;
+  projectBounds?: [number, number, number, number];
+  createFunctions?: boolean;
+}
+
+export default function metadataRoute(
+  db,
+  queryCache,
+  opts: MapboardServerOptions
+) {
   const sql = queryCache;
   return async function (req, res) {
     const projection = await db.one(sql["get-spatial-ref"]);
     const topology = await getTopologyInfo(db, sql, opts.topology);
+
+    const { projectBounds = null } = opts;
 
     res.send({
       app: "mapboard-server",
@@ -20,6 +34,7 @@ export default function metadataRoute(db, queryCache, opts) {
       projection,
       topology,
       backend: "PostGIS",
+      projectBounds,
       capabilities: [
         "basic-editing", // Tools defined in version 1 of the app
         "reshape",
