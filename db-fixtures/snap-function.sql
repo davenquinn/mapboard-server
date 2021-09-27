@@ -1,84 +1,117 @@
-CREATE OR REPLACE FUNCTION Linework_SnapEndpoints(
-  geom geometry,
-  width numeric,
-  types text[]
+DROP FUNCTION IF EXISTS ${data_schema~}.Linework_SnapEndpoints(geometry,numeric,text[]);
+DROP TYPE IF EXISTS ${data_schema~}.snapping_returntype;
+
+CREATE TYPE ${data_schema~}.snapping_returntype AS (
+  geometry   geometry,
+  start_snapped boolean,
+  end_snapped boolean,
+  err_message text,
+  err_context text
+);
+
+-- Create a buffer using geography or geometry, to allow
+-- us to use meters for buffering even when working in lat/lon
+-- coordinate systems.
+CREATE OR REPLACE FUNCTION ${data_schema~}.create_buffer(
+  input geometry,
+  width numeric
 )
-RETURNS geometry AS
-$$
-DECLARE
-point geometry;
-buffer geometry;
-closestPoint geometry;
-res geometry;
-ix int;
-
+RETURNS geometry AS $$
 BEGIN
-
--- Make sure we aren't dealing with multipolygons
-geom := ST_LineMerge(geom);
-
--- DO for both start and endpoints
-FOREACH ix IN ARRAY ARRAY[0,-1]
-LOOP
-  IF ix = 0 THEN
-    point := ST_StartPoint(geom);
-  ELSE
-    point := ST_EndPoint(geom);
-  END IF;
-
-  buffer := ST_Buffer(point, width);
-
-  SELECT
-    ST_ClosestPoint(ST_Intersection(l.geometry, buffer), point)
-  INTO closestPoint
-  FROM ${data_schema~}.linework l
-  WHERE ST_Intersects(l.geometry, buffer)
-    AND NOT l.hidden
-    AND coalesce((l.type = ANY(types)), true);
-
-  -- We have a geometry to append to
-  IF closestPoint IS NOT null THEN
-    buffer := ST_Buffer(closestPoint, width);
-    geom := ST_Difference(geom, buffer);
-    IF ix = -1 THEN
-      geom := ST_AddPoint(geom, closestPoint);
-    ELSE
-      geom := ST_AddPoint(geom, closestPoint, 0);
-    END IF;
-  END IF;
-
-END LOOP;
-
-RETURN geom;
-
+  RETURN ST_Buffer(input::geography, width)::geometry;
+-- we could probably do this without catching the exception
+EXCEPTION WHEN others THEN
+  RETURN ST_Buffer(input, width);
 END;
 $$
 LANGUAGE 'plpgsql' IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION ${data_schema~}.Linework_SRID()
-RETURNS integer AS
+CREATE OR REPLACE FUNCTION ${data_schema~}.Linework_SnapEndpoints(
+  input geometry,
+  width numeric,
+  types text[]
+)
+RETURNS ${data_schema~}.snapping_returntype AS
 $$
-SELECT srid FROM geometry_columns
-WHERE f_table_schema = ${data_schema}
-  AND f_table_name = 'linework'
-  AND f_geometry_column = 'geometry'
-$$ LANGUAGE SQL IMMUTABLE;
+DECLARE
+point geometry;
+buffer geometry;
+geom geometry;
+closestPoint geometry;
+res geometry;
+ix int;
+start_snapped boolean;
+end_snapped boolean;
+ret ${data_schema~}.snapping_returntype;
+err_context text;
 
-CREATE OR REPLACE FUNCTION ${data_schema~}.Polygon_SRID()
-RETURNS integer AS
-$$
-SELECT srid FROM geometry_columns
-WHERE f_table_schema = ${data_schema}
-  AND f_table_name = 'polygon'
-  AND f_geometry_column = 'geometry'
-$$ LANGUAGE SQL IMMUTABLE;
+BEGIN
 
-CREATE OR REPLACE FUNCTION ${data_schema~}.endpoint_intersections(geom geometry)
-RETURNS bigint[]
-AS
+  -- Make sure we aren't dealing with multipolygons
+  geom := ST_LineMerge(input);
+  start_snapped := false;
+  end_snapped := false;
+
+  -- DO for both start and endpoints
+  -- 0, -1 are point indices to work with
+  FOREACH ix IN ARRAY ARRAY[0,-1]
+  LOOP
+    IF ix = 0 THEN
+      point := ST_StartPoint(geom);
+    ELSE
+      point := ST_EndPoint(geom);
+    END IF;
+
+    -- do buffering using geography so that we always are working in meters
+    buffer := ${data_schema~}.create_buffer(point, width);
+
+    SELECT
+      ST_ClosestPoint(ST_Intersection(l.geometry, buffer), point)
+    INTO closestPoint
+    FROM ${data_schema~}.linework l
+    WHERE ST_Intersects(l.geometry, buffer)
+      AND NOT l.hidden
+      AND coalesce((l.type = ANY(types)), true);
+
+    -- We have a geometry to append to
+    IF closestPoint IS NOT null THEN
+      buffer := ${data_schema~}.create_buffer(closestPoint, width);
+      geom := ST_Difference(geom, buffer);
+      IF ix = -1 THEN
+        geom := ST_AddPoint(geom, closestPoint);
+        end_snapped := true;
+      ELSE
+        geom := ST_AddPoint(geom, closestPoint, 0);
+        start_snapped := true;
+      END IF;
+    END IF;
+  END LOOP;
+
+  -- Construct our record set
+  SELECT
+    ST_Multi(ST_MakeValid(geom)) geometry,
+    start_snapped,
+    end_snapped,
+    null,
+    null
+  INTO ret;
+
+  RETURN ret;
+
+EXCEPTION WHEN others THEN
+  GET STACKED DIAGNOSTICS err_context = PG_EXCEPTION_CONTEXT;
+
+  -- Construct an error record set
+  SELECT
+    ST_Multi(ST_MakeValid(ST_LineMerge(input))),
+    false,
+    false,
+    SQLERRM,
+    err_context
+  INTO ret;
+
+  RETURN ret;
+
+END;
 $$
-SELECT ARRAY[
-  (SELECT count(*)-1 FROM ${data_schema~}.linework l WHERE ST_Intersects(l.geometry, ST_StartPoint(ST_LineMerge(geom)))),
-  (SELECT count(*)-1 FROM ${data_schema~}.linework l WHERE ST_Intersects(l.geometry, ST_EndPoint(ST_LineMerge(geom))))
-];
-$$ LANGUAGE SQL IMMUTABLE;
+LANGUAGE 'plpgsql' IMMUTABLE;

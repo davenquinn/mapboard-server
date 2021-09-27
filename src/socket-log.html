@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font: 13px Helvetica, Arial;
+      }
+      #messages {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+      #messages li {
+        padding: 5px 10px;
+      }
+      #messages li:nth-child(odd) {
+        background: #eee;
+      }
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <!-- Thanks for being complex, Parcel 2! -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+      socket.on("topology", function (msg) {
+        var ul = document.querySelector("#messages");
+        var li = document.createElement("li");
+        li.appendChild(document.createTextNode(JSON.stringify(msg, null, 2)));
+        ul.appendChild(li);
+      });
+    </script>
+  </body>
+</html>
