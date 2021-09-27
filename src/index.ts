@@ -8,7 +8,7 @@ import metaRoute, { MapboardServerOptions } from "./meta";
 import database, { buildQueryCache } from "./database";
 import cors from "cors";
 // @ts-ignore
-import html from "url:./socket-log.html";
+//import html from "url:./socket-log.html";
 import { join } from "path";
 
 function appFactory(opts: MapboardServerOptions = {}) {
@@ -36,9 +36,10 @@ function appFactory(opts: MapboardServerOptions = {}) {
     app.use("/tiles", tileServer(opts.tiles));
   }
 
-  app.get("/socket-test", (req, res) => {
-    res.sendFile(__dirname + html);
-  });
+  // Socket test throws error due to bundling weirdness
+  // app.get("/socket-test", (req, res) => {
+  //   res.sendFile(__dirname + html);
+  // });
 
   return app;
 }
