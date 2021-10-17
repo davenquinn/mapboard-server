@@ -2,8 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import { SQLCache, pgp } from "./database";
 import { IDatabase } from "pg-promise";
-import wkx from "wkx";
-import { Buffer } from "buffer";
+import { serializeFeature, parseGeometry } from "./util";
 
 //# Support functions ##
 
@@ -12,45 +11,6 @@ function log(d) {
 }
 
 const schema = process.env.MAPBOARD_SCHEMA || "map_digitizer";
-
-const serializeFeature = function (r) {
-  const geometry = Buffer.from(r.geometry, "hex").toString("base64");
-  const { id, pixel_width, map_width, certainty } = r;
-
-  const type = r.type != null ? r.type.trim() : null;
-
-  let feature = {
-    type: "Feature",
-    geometry,
-    id,
-    properties: {
-      type,
-      color: r.color.trim(),
-      pixel_width,
-      map_width,
-      certainty,
-    },
-  };
-
-  // Handle erasing transparently-ish
-  // with an extension to the GeoJSON protocol
-  if (r.erased == null) {
-    r.erased = false;
-  }
-  if (r.erased) {
-    feature = {
-      type: "DeletedFeature",
-      id: r.id,
-    };
-  }
-  return feature;
-};
-
-const parseGeometry = function (f) {
-  // Parses a geojson (or wkb, or ewkb) feature to geometry
-  //console.log(f.geometry);
-  return wkx.Geometry.parse(f.geometry).toEwkb().toString("hex");
-};
 
 const send = (res) =>
   function (data) {
