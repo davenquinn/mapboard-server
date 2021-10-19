@@ -52,5 +52,13 @@ function createServer(app) {
   return server;
 }
 
-export { argParser } from "./arg-parser";
-export { appFactory, topologyWatcher, createServer };
+import { argParser } from "./arg-parser";
+module.exports = {
+  argParser,
+  appFactory,
+  topologyWatcher,
+  createServer,
+};
+
+// export { argParser } from "./arg-parser";
+// export { appFactory, topologyWatcher, createServer };
