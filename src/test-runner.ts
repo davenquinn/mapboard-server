@@ -1,7 +1,7 @@
 import "regenerator-runtime/runtime.js";
 import { serial as test } from "ava";
 import database, { buildQueryCache } from "./database";
-import { parseGeometry } from "./util";
+import { parseGeometry, serializeGeometry } from "./util";
 import { join } from "path";
 import { readFileSync } from "fs";
 import { Geometry, Polygon } from "wkx";
@@ -10,14 +10,17 @@ const db = database({
   connection: process.env.MAPBOARD_TEST_DB,
 });
 
+const srid = parseInt(process.env.MAPBOARD_SRID);
+const schema = process.env.MAPBOARD_SCHEMA || "map_digitizer";
+
 const queryDir = join(__dirname, "..", "/sql");
 const opts = {
-  schema: process.env.MAPBOARD_SCHEMA || "map_digitizer",
+  schema,
 };
 const sql = buildQueryCache(queryDir, opts);
 const testSQL = buildQueryCache(join(__dirname, "..", "/sql/testing"), {
   ...opts,
-  srid: parseInt(process.env.MAPBOARD_SRID),
+  srid,
 });
 
 test("create an initial savepoint", async (t) => {
@@ -119,25 +122,36 @@ test("test healing", async (t) => {
     ],
   ];
 
-  const geometry = Geometry.parseGeoJSON({
+  let geometry = Geometry.parseGeoJSON({
     type: "Polygon",
     coordinates,
-  }).toEwkt();
-
-  console.log(geometry);
-
-  const features = await db.query(sql["get-features-in-polygon"], {
-    geometry,
-    schema: "map_digitizer",
-    table: "linework",
-    type_table: "linework_type",
   });
+  geometry.srid = srid;
+
+  const features = await db.query(
+    "SELECT id FROM map_digitizer.linework WHERE ST_Intersects(geometry, ${geometry})",
+    {
+      geometry: geometry.toEwkt(),
+    }
+  );
 
   console.log(features);
 
   const res = await db.query(sql["heal-lines"], {
-    features,
+    features: features.map((d) => d.id),
     type: "default",
     tolerance: 0.1,
   });
+
+  console.log(res);
+
+  const res1 = res.map((d) => {
+    const buffer = new Buffer(d.geometry, "hex");
+    return {
+      ...d,
+      geometry: Geometry.parse(buffer).toGeoJSON(),
+    };
+  });
+
+  console.log(JSON.stringify(res1));
 });
