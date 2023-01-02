@@ -9,5 +9,5 @@ done
 
 conn="postgresql://postgres@db/$dbname"
 
-node ./create-tables.js --srid "${MAPBOARD_SRID:-4326}" "$conn"
-node ./src/cli.js "$conn"
+node ./dist/cli.js create-tables --srid "${MAPBOARD_SRID:-4326}" "$conn"
+node ./dist/cli.js serve "$conn"
